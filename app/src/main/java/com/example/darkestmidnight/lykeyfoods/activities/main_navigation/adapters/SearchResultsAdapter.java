@@ -56,6 +56,7 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
         String uFN = user.getFirstName() + " " + user.getLastName();
         holder.userFN.setText(uFN);
         holder.userUN.setText(user.getUsername());
+        // test
     }
 
     @Override
