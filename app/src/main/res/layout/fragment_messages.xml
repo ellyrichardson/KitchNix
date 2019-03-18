@@ -1,0 +1,62 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/baseMsgRelativeLayout"
+    android:background="#DCCFB6"
+    android:layout_width="match_parent"
+    android:layout_height="49dp"
+    tools:context=".activities.main_navigation.bottom_navigation.MessagesFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <RelativeLayout
+        android:id="@+id/topSearchBar"
+        android:layout_width="match_parent"
+        android:layout_height="68dp"
+        android:layout_alignParentStart="true"
+        android:layout_alignParentTop="true"
+        android:background="#AC3B61"
+        android:gravity="center_horizontal"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.8"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <EditText
+            android:id="@+id/searchTopBar"
+            android:layout_width="201dp"
+            android:layout_height="34dp"
+            android:layout_alignParentStart="true"
+            android:layout_centerVertical="true"
+            android:layout_marginStart="41dp"
+            android:background="@drawable/edittext_bg"
+            android:ems="10"
+            android:inputType="textPersonName"
+            android:text="Search Friend To Chat" />
+
+        <ImageButton
+            android:id="@+id/searchFriendBtn"
+            android:layout_width="36dp"
+            android:layout_height="31dp"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="108dp"
+            android:background="#AC3B61"
+            android:clickable="true"
+            app:srcCompat="@android:drawable/ic_search_category_default" />
+
+        <ImageButton
+            android:id="@+id/composeMsgBtn"
+            android:layout_width="47dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="true"
+            android:layout_centerVertical="true"
+            android:layout_marginEnd="40dp"
+            android:background="#AC3B61"
+            android:clickable="true"
+            android:src="@android:drawable/ic_menu_edit" />
+
+    </RelativeLayout>
+
+</RelativeLayout>

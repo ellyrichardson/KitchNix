@@ -1,0 +1,114 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/baseSttngsRelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DCCFB6"
+    tools:context=".activities.main_navigation.bottom_navigation.SettingsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="551dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true"
+        android:layout_marginEnd="0dp">
+
+        <LinearLayout
+
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+            <RelativeLayout
+                android:layout_width="match_parent"
+                android:layout_height="213dp">
+
+                <ImageButton
+                    android:id="@+id/uInfoBtn"
+                    android:layout_width="60dp"
+                    android:layout_height="41dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="99dp"
+                    android:background="#DCCFB6"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_info_black_24dp" />
+
+                <ImageButton
+                    android:id="@+id/uPostsBtn"
+                    android:layout_width="60dp"
+                    android:layout_height="41dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginEnd="25dp"
+                    android:background="#DCCFB6"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_list_black_24dp" />
+
+                <ImageButton
+                    android:id="@+id/uFriendsBtn"
+                    android:layout_width="60dp"
+                    android:layout_height="41dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_centerHorizontal="true"
+                    android:background="#DCCFB6"
+                    android:clickable="true"
+                    app:srcCompat="@drawable/ic_supervisor_account_black_24dp" />
+
+                <ImageView
+                    android:id="@+id/sRUProfilePic"
+                    android:layout_width="147dp"
+                    android:layout_height="149dp"
+                    android:layout_alignParentStart="true"
+                    android:layout_centerVertical="true"
+                    android:layout_marginStart="24dp"
+                    android:background="#DCDCDC"
+                    android:src="@drawable/ic_person_black_24dp" />
+
+                <TextView
+                    android:id="@+id/uFullNameET"
+                    android:layout_width="192dp"
+                    android:layout_height="39dp"
+                    android:layout_alignParentEnd="true"
+                    android:layout_alignParentTop="true"
+                    android:layout_marginEnd="39dp"
+                    android:layout_marginTop="40dp"
+                    android:text="Full Name"
+                    android:textColor="#900C3F"
+                    android:textSize="25sp" />
+            </RelativeLayout>
+
+            <TextView
+                android:id="@+id/uQuoteET"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentEnd="true"
+                android:text="Quote"
+                android:textColor="#900C3F"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/uDoBET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Date Of Birth"
+                android:textColor="#900C3F"
+                android:textSize="25sp" />
+
+            <TextView
+                android:id="@+id/uBioET"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Biography"
+                android:textColor="#900C3F"
+                android:textSize="25sp" />
+
+        </LinearLayout>
+    </ScrollView>
+
+</RelativeLayout>
