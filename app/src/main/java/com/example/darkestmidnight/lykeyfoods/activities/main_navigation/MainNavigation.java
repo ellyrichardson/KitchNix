@@ -93,8 +93,8 @@ public class MainNavigation extends AppCompatActivity {
     }
 
     // so it can be called from the adapter
-    public void userFragment() {
-        frag = UserFragment.newInstance("test1", "test2");
+    public void userFragment(Bundle args) {
+        frag = UserFragment.newInstance("test1", args);
         if (frag != null) {
             FragmentTransaction ft = getSupportFragmentManager().beginTransaction();
             ft.replace(R.id.fragmentContainer, frag, frag.getTag());

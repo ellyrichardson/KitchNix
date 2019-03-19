@@ -1,6 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters;
 
 import android.content.Context;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,6 +10,7 @@ import android.widget.TextView;
 
 import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.MainNavigation;
+import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.users_info.UserFragment;
 import com.example.darkestmidnight.lykeyfoods.models.User;
 
 import java.util.List;
@@ -17,6 +19,8 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
     private List<User> users;
 
     MainNavigation mainNavHelper;
+
+    UserFragment userFragHelper;
 
     Context context;
 
@@ -28,8 +32,6 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
             userFN = (TextView) view.findViewById(R.id.userFullName);
             userUN = (TextView) view.findViewById(R.id.userUsername);
 
-            sRFullName = (TextView) view.findViewById(R.id.sRUFullNameET);
-
             // when userUN is clicked, then go to their profile
             userUN.setOnClickListener(new View.OnClickListener() {
                 @Override
@@ -37,18 +39,21 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
 
                     // pass MainNavigation instance to the adapter
                     if (context instanceof MainNavigation) {
-                        ((MainNavigation) context).userFragment();
+
+                        Bundle args = new Bundle();
 
                         String rUsername = userUN.getText().toString();
+                        String tmpFullName = "";
 
-                        // fix this
-
+                        // gets other info of matching user based on username
                         for (int i = 0; i < getItemCount(); i++) {
                             if (users.get(i).getUsername() == rUsername) {
-                                String tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
-                                sRFullName.setText(tmpFullName);
+                                tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
                             }
                         }
+                        // to pass result values to userFragment
+                        args.putString("sRFullName", tmpFullName);
+                        ((MainNavigation) context).userFragment(args);
                     }
 
 
