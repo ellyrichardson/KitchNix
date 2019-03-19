@@ -132,7 +132,7 @@ public class GetSearchBoxResults extends AsyncTask<String, String, String> {
 
             if (context != null) {
                 // sets the adapter to output users with view holder
-                uAdapter = new SearchResultsAdapter(usersToShow);
+                uAdapter = new SearchResultsAdapter(context, usersToShow);
                 // sets the recycler view to use for the users view holders to be put
                 RecyclerView.LayoutManager pLayoutManager = new LinearLayoutManager(context.getApplicationContext());
                 srchBoxRecyclerView = (RecyclerView) activity.findViewById(R.id.searchBoxRcyclerV);

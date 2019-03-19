@@ -1,5 +1,6 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters;
 
+import android.content.Context;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,28 +18,47 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
 
     MainNavigation mainNavHelper;
 
+    Context context;
+
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        public TextView userFN, userUN;
+        public TextView userFN, userUN, sRFullName;
 
         public CustomViewHolder(View view) {
             super(view);
             userFN = (TextView) view.findViewById(R.id.userFullName);
             userUN = (TextView) view.findViewById(R.id.userUsername);
 
+            sRFullName = (TextView) view.findViewById(R.id.sRUFullNameET);
+
             // when userUN is clicked, then go to their profile
             userUN.setOnClickListener(new View.OnClickListener() {
                 @Override
                 public void onClick(View v) {
-                    userUN.setText("this text was clicked");
 
-                    mainNavHelper = new MainNavigation();
-                    mainNavHelper.userFragment();
+                    // pass MainNavigation instance to the adapter
+                    if (context instanceof MainNavigation) {
+                        ((MainNavigation) context).userFragment();
+
+                        String rUsername = userUN.getText().toString();
+
+                        // fix this
+
+                        for (int i = 0; i < getItemCount(); i++) {
+                            if (users.get(i).getUsername() == rUsername) {
+                                String tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
+                                sRFullName.setText(tmpFullName);
+                            }
+                        }
+                    }
+
+
                 }
             });
         }
     }
 
-    public SearchResultsAdapter(List<User> users){
+    public SearchResultsAdapter(Context context, List<User> users){
+        this.context = context;
         this.users = users;
     }
 
