@@ -1,0 +1,42 @@
+{
+  "project_info": {
+    "project_number": "165934757345",
+    "firebase_url": "https://lykeyfoods.firebaseio.com",
+    "project_id": "lykeyfoods",
+    "storage_bucket": "lykeyfoods.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:165934757345:android:52324dc79e878ec7",
+        "android_client_info": {
+          "package_name": "com.example.darkestmidnight.lykeyfoods"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "165934757345-5ca919t1obkv8n0itbamkc0ua4trhnhp.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC44MNaQswOMr8cq-1gxIKCSg7rVD2L0Nk"
+        }
+      ],
+      "services": {
+        "analytics_service": {
+          "status": 1
+        },
+        "appinvite_service": {
+          "status": 1,
+          "other_platform_oauth_client": []
+        },
+        "ads_service": {
+          "status": 2
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
