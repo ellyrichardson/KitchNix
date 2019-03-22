@@ -1,6 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.users_info;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -35,7 +36,12 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private String mParam2;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference ref = database.getReference("server/saving-data/fireblog");
+    DatabaseReference ref = database.getReference("friend_requests/");
+
+    SharedPreferences ShPreference;
+    SharedPreferences.Editor PrefEditor;
+    static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences everywhere
+    String currentUserID = "Current User";
 
     TextView sRFullName;
 
@@ -134,6 +140,10 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     @Override
     public void addToFriends() {
+        ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        // converts Stringed userID back to Int
+        int userSignedIn = Integer.parseInt(ShPreference.getString(currentUserID, ""));
+
 
     }
 

@@ -27,8 +27,9 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
 
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
-    static String MyPREFERENCES = "API Authentication";
+    static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences
     String accessToken = "Access Token";
+    String currentUserID = "Current User";
 
     TextView uFullName;
 
@@ -53,6 +54,7 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
         Context context = mUserInfoReference.get();
         // gets the AccessToken
         ShPreference = context.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+
         String APIAuthentication = "Bearer " + ShPreference.getString(accessToken, "");
 
         HttpURLConnection httpURLConnection = null;
@@ -112,6 +114,14 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
                 JSONObject pJObj_data = pJObjArray.getJSONObject(i);
                 // Sets the profile name to the user's full name
                 uStrFullN = pJObj_data.getString("first_name")+ " " + pJObj_data.getString("last_name");
+
+                // converts user ID to int for security
+                String tmpInt = pJObj_data.getInt("id") + "";
+
+                PrefEditor = ShPreference.edit();
+                // to save currentUserID
+                PrefEditor.putString(currentUserID, tmpInt);
+                PrefEditor.commit();
             }
 
         } catch (JSONException e) {
