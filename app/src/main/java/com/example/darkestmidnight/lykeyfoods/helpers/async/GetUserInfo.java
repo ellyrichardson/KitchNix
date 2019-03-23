@@ -116,11 +116,11 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
                 uStrFullN = pJObj_data.getString("first_name")+ " " + pJObj_data.getString("last_name");
 
                 // converts user ID to int for security
-                String tmpInt = pJObj_data.getInt("id") + "";
+                //String tmpInt = pJObj_data.getInt("id") + "";
 
                 PrefEditor = ShPreference.edit();
                 // to save currentUserID
-                PrefEditor.putString(currentUserID, tmpInt);
+                PrefEditor.putInt(currentUserID, pJObj_data.getInt("id"));
                 PrefEditor.commit();
             }
 

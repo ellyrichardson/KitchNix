@@ -4,6 +4,7 @@ import android.content.Context;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -12,10 +13,16 @@ import android.widget.TextView;
 
 import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.helpers.interactions.UserInteraction;
+import com.example.darkestmidnight.lykeyfoods.models.FriendRequestJSON;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -36,7 +43,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private String mParam2;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference ref = database.getReference("friend_requests/");
+    DatabaseReference rootRef = database.getReference("friend_requests/users");
 
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
@@ -142,7 +149,34 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     public void addToFriends() {
         ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         // converts Stringed userID back to Int
-        int userSignedIn = Integer.parseInt(ShPreference.getString(currentUserID, ""));
+        int userSignedIn = ShPreference.getInt(currentUserID, 0);
+        // converts the id to string
+        final String strUID = userSignedIn + "";
+
+        // TODO: change this to actual feature requirements, this is a test only
+        DatabaseReference usersRef = rootRef.child(strUID);
+        usersRef.child("friends").push().setValue("idfriend1");
+
+        /*rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                if(dataSnapshot.hasChild(strUID)){
+                    // TODO: change this to actual feature requirements, this is a test only
+                    DatabaseReference usersRef = rootRef.child(strUID);
+                    usersRef.child("friends").push().setValue("idfriend1");
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });*/
+
+        Map<String, FriendRequestJSON> friendRequests = new HashMap<>();
+        //friendRequests.child("")
+
+
 
 
     }
