@@ -161,9 +161,6 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 if(dataSnapshot.hasChild(strUID)){
-                    // TODO: change this to actual feature requirements, this is a test only
-                    DatabaseReference usersRef = rootRef.child(strUID);
-                    usersRef.child("friends").push().setValue("idfriend1");
                 }
             }
 
