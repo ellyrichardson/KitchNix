@@ -25,15 +25,17 @@
 
             <RelativeLayout
                 android:layout_width="match_parent"
-                android:layout_height="213dp">
+                android:layout_height="243dp"
+                android:layout_alignParentBottom="true"
+                android:layout_alignParentStart="true">
 
                 <ImageButton
                     android:id="@+id/sRUInfoBtn"
                     android:layout_width="60dp"
                     android:layout_height="41dp"
-                    android:layout_alignBottom="@+id/sRUProfilePic"
                     android:layout_alignParentEnd="true"
-                    android:layout_marginEnd="99dp"
+                    android:layout_centerVertical="true"
+                    android:layout_marginEnd="102dp"
                     android:background="#DCCFB6"
                     android:clickable="true"
                     app:srcCompat="@drawable/ic_info_black_24dp" />
@@ -42,8 +44,8 @@
                     android:id="@+id/sRUPostsBtn"
                     android:layout_width="60dp"
                     android:layout_height="41dp"
-                    android:layout_alignBottom="@+id/sRUProfilePic"
                     android:layout_alignParentEnd="true"
+                    android:layout_centerVertical="true"
                     android:layout_marginEnd="25dp"
                     android:background="#DCCFB6"
                     android:clickable="true"
@@ -53,8 +55,7 @@
                     android:id="@+id/sRUFriendsBtn"
                     android:layout_width="60dp"
                     android:layout_height="41dp"
-                    android:layout_alignBottom="@+id/sRUProfilePic"
-                    android:layout_centerHorizontal="true"
+                    android:layout_centerInParent="true"
                     android:background="#DCCFB6"
                     android:clickable="true"
                     app:srcCompat="@drawable/ic_supervisor_account_black_24dp" />
@@ -62,7 +63,7 @@
                 <ImageView
                     android:id="@+id/sRUProfilePic"
                     android:layout_width="147dp"
-                    android:layout_height="149dp"
+                    android:layout_height="163dp"
                     android:layout_alignParentStart="true"
                     android:layout_centerVertical="true"
                     android:layout_marginStart="24dp"
@@ -72,14 +73,67 @@
                 <TextView
                     android:id="@+id/sRUFullNameET"
                     android:layout_width="192dp"
-                    android:layout_height="39dp"
-                    android:layout_alignParentEnd="true"
-                    android:layout_alignParentTop="true"
-                    android:layout_marginEnd="39dp"
-                    android:layout_marginTop="40dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/sRUFriendsBtn"
+                    android:layout_alignTop="@+id/sRUProfilePic"
                     android:text="Full Name"
                     android:textColor="#900C3F"
                     android:textSize="25sp" />
+
+                <TextView
+                    android:id="@+id/sRUUsernameET"
+                    android:layout_width="164dp"
+                    android:layout_height="wrap_content"
+                    android:layout_alignStart="@+id/sRUFriendsBtn"
+                    android:layout_below="@+id/sRUFullNameET"
+                    android:text="Username"
+                    android:textColor="#900C3F"
+                    android:textSize="15sp" />
+
+                <Button
+                    android:id="@+id/sRUFriendReqSentBtn"
+                    android:layout_width="146dp"
+                    android:layout_height="36dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginEnd="56dp"
+                    android:background="@drawable/button_used"
+                    android:text="Request Sent" />
+
+                <Button
+                    android:id="@+id/sRUAcceptRequestBtn"
+                    android:layout_width="146dp"
+                    android:layout_height="36dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginEnd="56dp"
+                    android:background="@drawable/button_used"
+                    android:text="Accept Request" />
+
+                <Button
+                    android:id="@+id/sRUWeFriendsBtn"
+                    android:layout_width="146dp"
+                    android:layout_height="36dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="12dp"
+                    android:layout_marginEnd="56dp"
+                    android:background="@drawable/button_green"
+                    android:text="Friends" />
+
+                <Button
+                    android:id="@+id/sRUAddFriendBtn"
+                    android:layout_width="146dp"
+                    android:layout_height="37dp"
+                    android:layout_alignBottom="@+id/sRUProfilePic"
+                    android:layout_alignParentEnd="true"
+                    android:layout_marginBottom="11dp"
+                    android:layout_marginEnd="56dp"
+                    android:background="@drawable/button_generic"
+                    android:text="Add Friend" />
+
             </RelativeLayout>
 
             <TextView

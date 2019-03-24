@@ -9,6 +9,7 @@ import android.util.Log;
 import android.widget.TextView;
 
 import com.example.darkestmidnight.lykeyfoods.R;
+import com.example.darkestmidnight.lykeyfoods.activities.sign_in.SignIn;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -103,6 +104,7 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
         uFullName = (TextView) activity.findViewById(R.id.uFullNameET);
 
         String uStrFullN="";
+        int uID = 0;
 
         try {
             // DRF API returns an array for this
@@ -117,18 +119,21 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
 
                 // converts user ID to int for security
                 //String tmpInt = pJObj_data.getInt("id") + "";
-
-                PrefEditor = ShPreference.edit();
-                // to save currentUserID
-                PrefEditor.putInt(currentUserID, pJObj_data.getInt("id"));
-                PrefEditor.commit();
+                uID = pJObj_data.getInt("id");
             }
 
         } catch (JSONException e) {
-            //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             Log.d("Json","Exception = "+e.toString());
         } finally {
-            if (context != null) {
+            // checks if SignIN is being used
+            if (context instanceof SignIn) {
+                // Combines the first name and last name of the current user
+                PrefEditor = ShPreference.edit();
+                // to save currentUserID
+                PrefEditor.putInt(currentUserID, uID);
+                PrefEditor.commit();
+            }
+            else if (context != null) {
                 // Combines the first name and last name of the current user
                 uFullName.setText(uStrFullN);
             }

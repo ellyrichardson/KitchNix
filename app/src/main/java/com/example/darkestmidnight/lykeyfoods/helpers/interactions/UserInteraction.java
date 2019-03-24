@@ -3,10 +3,10 @@ package com.example.darkestmidnight.lykeyfoods.helpers.interactions;
 public class UserInteraction {
 
     public interface FriendRequests {
-        void acceptFriendRequest();
+        void acceptFriendRequest(String accptUID, String signedInUID);
         void checkIfRequestExist();
         void declineFriendRequest();
-        void addToFriends();
+        void addToFriends(String uName, String signedInID);
     }
 
     interface ChatRooms {

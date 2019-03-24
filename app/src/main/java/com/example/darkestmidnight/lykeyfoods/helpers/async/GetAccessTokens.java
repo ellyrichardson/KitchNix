@@ -1,5 +1,6 @@
 package com.example.darkestmidnight.lykeyfoods.helpers.async;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.SharedPreferences;
 import android.os.AsyncTask;
@@ -25,11 +26,15 @@ public class GetAccessTokens extends AsyncTask<String, String, String> {
     static String MyPREFERENCES = "API Authentication";
     String accessToken = "Access Token";
 
+    GetUserInfo getUserID;
+
     private WeakReference<Context> mSignInReference;
+    Activity activity;
 
     // constructor
-    public GetAccessTokens(Context context){
+    public GetAccessTokens(Context context, Activity activity){
         mSignInReference = new WeakReference<>(context);
+        this.activity = activity;
     }
 
     @Override
@@ -108,6 +113,7 @@ public class GetAccessTokens extends AsyncTask<String, String, String> {
         Context context = mSignInReference.get();
 
         ShPreference = context.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        getUserID = new GetUserInfo(context, activity);
 
         // edits shared preferences for authentication and authorization
         PrefEditor = ShPreference.edit();
@@ -117,6 +123,9 @@ public class GetAccessTokens extends AsyncTask<String, String, String> {
             JSONObject pJObject = new JSONObject(result);
             PrefEditor.putString(accessToken, pJObject.getString("access_token"));
             PrefEditor.commit();
+
+            // calls getUserID to keep track of the user id throughout hte app
+            getUserID.execute("http://192.168.1.4:8000/api/userinfo/");
 
         } catch (JSONException e) {
             Log.d("Json","Exception = "+e.toString());

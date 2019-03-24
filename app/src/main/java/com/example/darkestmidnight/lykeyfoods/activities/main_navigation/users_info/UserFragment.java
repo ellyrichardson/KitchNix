@@ -1,6 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.users_info;
 
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
@@ -9,6 +10,7 @@ import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.Button;
 import android.widget.TextView;
 
 import com.example.darkestmidnight.lykeyfoods.R;
@@ -21,6 +23,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -43,7 +46,8 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private String mParam2;
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
-    DatabaseReference rootRef = database.getReference("friend_requests/users");
+    //DatabaseReference rootRef = database.getReference("friend_requests/users");
+    DatabaseReference rootRef = database.getReference("friend_requests/test");
 
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
@@ -51,6 +55,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     String currentUserID = "Current User";
 
     TextView sRFullName;
+    Button addFriendBtn, sentRequestBtn, acceptRequestBtn, wereFriendsBtn;
 
     private OnFragmentInteractionListener mListener;
 
@@ -95,6 +100,168 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
         sRFullName = (TextView) view.findViewById(R.id.sRUFullNameET);
+
+        addFriendBtn = (Button) view.findViewById(R.id.sRUAddFriendBtn);
+        sentRequestBtn = (Button) view.findViewById(R.id.sRUFriendReqSentBtn);
+        acceptRequestBtn = (Button) view.findViewById(R.id.sRUAcceptRequestBtn);
+        wereFriendsBtn = (Button) view.findViewById(R.id.sRUWeFriendsBtn);
+
+        // sentRequested[0] for checking if sent request, sentRequested[1] for checking if received request
+        final boolean[] sentRequested = new boolean[2];
+        final boolean[] weFriends = new boolean[1];
+
+        final String sRUID = getArguments().getString("sRUserID");
+
+        ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+        // converts Stringed userID back to Int
+        int userSignedIn = ShPreference.getInt(currentUserID, 0);
+        // converts the userSignedIn id to string
+        final String strSignedInUID = userSignedIn + "";
+
+        //TODO: Refactor the whole adding friendRequest and make it elegant if possible
+        final DatabaseReference checkSentRequestsRef = database.getReference("friend_requests/test/" + strSignedInUID + "/sentFriendRequests");
+        final DatabaseReference checkReceivedRequestsRef = database.getReference("friend_requests/test/" + strSignedInUID + "/receivedFriendRequests");
+        final DatabaseReference checkMyFriendsRef = database.getReference("friend_requests/test/" + strSignedInUID + "/friends");
+        //final DatabaseReference innerCheckRequestsRef = checkRequestsRef.child("sentFriendRequests");
+
+        addFriendBtn.setVisibility(View.GONE);
+        sentRequestBtn.setVisibility(View.GONE);
+        acceptRequestBtn.setVisibility(View.GONE);
+        wereFriendsBtn.setVisibility(view.GONE);
+
+        // checks if the current User visited has been sent a friend Request
+        checkSentRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // stores children of sentFriendRequests for checking if sent a request to the user already
+                ArrayList<String> sentReqArrayList = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String sentFriendReqIds = ds.getValue(String.class);
+                    sentReqArrayList.add(sentFriendReqIds);
+                }
+                // hides add friend button if already sent a request to the user
+                if (sentReqArrayList.contains(sRUID)) {
+                    sentRequested[0] = true;
+                    //sentRequestBtn.setVisibility(View.VISIBLE);
+                }
+                else {
+                    //addFriendBtn.setVisibility(View.VISIBLE);
+                    sentRequested[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        // checks if the current User visiting received a request from the visited user
+        checkReceivedRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // stores children of sentFriendRequests for checking if sent a request to the user already
+                ArrayList<String> receivedReqArrayList = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String receivedFriendReqIds = ds.getValue(String.class);
+                    receivedReqArrayList.add(receivedFriendReqIds);
+                }
+                // sets receivedRequest element of boolean to true if received request
+                if (receivedReqArrayList.contains(sRUID)) {
+                    sentRequested[1] = true;
+                    //sentRequestBtn.setVisibility(View.VISIBLE);
+                }
+                else {
+                    //addFriendBtn.setVisibility(View.VISIBLE);
+                    sentRequested[1] = false;
+                }
+
+                // when the existing Friends button was pressed
+                addFriendBtn.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View v) {
+                        sentRequestBtn.setVisibility(View.VISIBLE);
+                        addFriendBtn.setVisibility(View.GONE);
+                        addToFriends(sRUID, strSignedInUID);
+                    }
+                });
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+
+        // checks if the current User visiting received a request from the visited user
+        checkMyFriendsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // stores children of sentFriendRequests for checking if sent a request to the user already
+                ArrayList<String> myFriendsArrayList = new ArrayList<>();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    String myFriendsIds = ds.getValue(String.class);
+                    myFriendsArrayList.add(myFriendsIds);
+                }
+                // sets receivedRequest element of boolean to true if received request
+                if (myFriendsArrayList.contains(sRUID)) {
+                    weFriends[0] = true;
+                    //sentRequestBtn.setVisibility(View.VISIBLE);
+                }
+                else {
+                    //addFriendBtn.setVisibility(View.VISIBLE);
+                    weFriends[0] = false;
+                }
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+        //addFriendBtn = (Button) view.findViewById(R.id.sRUAddFriendBtn);
+
+        // checks if signed in user is friends with the visited user, if not then allow friend requesting
+        if (!weFriends[0]) {
+            if (sentRequested[0]  && !sentRequested[1]) {
+                sentRequestBtn.setVisibility(View.VISIBLE);
+            }
+            else if (!sentRequested[0] && sentRequested[1]) {
+                acceptRequestBtn.setVisibility(View.VISIBLE);
+            }
+            else if (!sentRequested[0] && !sentRequested[1]) {
+                addFriendBtn.setVisibility(View.VISIBLE);
+            }
+        }
+        else {
+            wereFriendsBtn.setVisibility(View.VISIBLE);
+        }
+
+        // when the existing Friends button was pressed
+        addFriendBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                sentRequestBtn.setVisibility(View.VISIBLE);
+                addFriendBtn.setVisibility(View.GONE);
+                acceptRequestBtn.setVisibility(View.GONE);
+                wereFriendsBtn.setVisibility(View.GONE);
+                addToFriends(sRUID, strSignedInUID);
+            }
+        });
+        //TODO: Check conflicts on showing status, could be friends but not really
+        // when accepting friend request from visited user
+        acceptRequestBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                acceptFriendRequest(sRUID, strSignedInUID);
+                sentRequestBtn.setVisibility(View.GONE);
+                addFriendBtn.setVisibility(View.GONE);
+                acceptRequestBtn.setVisibility(View.GONE);
+                wereFriendsBtn.setVisibility(View.VISIBLE);
+            }
+        });
+
+        // sets the name with the Full Name; called from SearchResultsAdapter
         sRFullName.setText(getArguments().getString("sRFullName"));
     }
 
@@ -145,22 +312,55 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         void onFragmentInteraction(Uri uri);
     }
 
+    // function to Add Friends
     @Override
-    public void addToFriends() {
-        ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-        // converts Stringed userID back to Int
-        int userSignedIn = ShPreference.getInt(currentUserID, 0);
-        // converts the id to string
-        final String strUID = userSignedIn + "";
+    public void addToFriends(String uName, String uSignedIn) {
+        final String strUID = uSignedIn;
 
         // TODO: change this to actual feature requirements, this is a test only
-        DatabaseReference usersRef = rootRef.child(strUID);
-        usersRef.child("friends").push().setValue("idfriend1");
+        // to put the sent request to the logged in user's sentFriendRequests
+        DatabaseReference sentFriendReqRef = rootRef.child(strUID + "/sentFriendRequests");
+        //usersRef.push().setValue("sentFriendRequests");
+        //DatabaseReference sentFriendReqRef = usersRef.child("sentFriendRequests");
+        sentFriendReqRef.push().setValue(uName);
 
-        /*rootRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        // To put the request to addedUser receivedFriendRequests
+        DatabaseReference receivedFriendReqRef = rootRef.child(uName + "/receivedFriendRequests");
+        //DatabaseReference receivedFriendReqRef = addedUserRef.child("receivedFriendRequests");
+        receivedFriendReqRef.push().setValue(strUID);
+
+        Map<String, FriendRequestJSON> friendRequests = new HashMap<>();
+        //friendRequests.child("")
+    }
+
+    @Override
+    public void acceptFriendRequest(String accptUID, String signedInUID) {
+        final String strSignedInUID = signedInUID;
+
+        // senderReceiver[0] is the sender, senderReceiver[1] is the receiver
+        final boolean[] senderReceiver = new boolean[2];
+
+
+        DatabaseReference checkSenderReqRef = rootRef.child(accptUID + "/sentFriendRequests");
+        DatabaseReference checkReceiverReqRef = rootRef.child(strSignedInUID + "/receivedFriendRequests");
+
+        checkSenderReqRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                if(dataSnapshot.hasChild(strUID)){
+                // stores children of sentFriendRequests from the sending user
+                ArrayList<String> sentReqArrayList = new ArrayList<>();
+
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    // gets ids in the sentFriendRequests of the adding user
+                    String sentFriendReqIds = ds.getValue(String.class);
+                    sentReqArrayList.add(sentFriendReqIds);
+                }
+                // checks if the requester have actually sent the request if the userSignedIn received it
+                if (sentReqArrayList.contains(strSignedInUID)) {
+                    senderReceiver[0] = true;
+                }
+                else {
+                    senderReceiver[0] = false;
                 }
             }
 
@@ -168,19 +368,49 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
             public void onCancelled(@NonNull DatabaseError databaseError) {
 
             }
-        });*/
+        });
 
-        Map<String, FriendRequestJSON> friendRequests = new HashMap<>();
-        //friendRequests.child("")
+        checkReceiverReqRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                // stores children of receivedFriendRequests from the receiving user
+                ArrayList<String> receivedReqArrayList = new ArrayList<>();
 
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    // gets ids in the receivedFriendRequests of the receiving user
+                    String receivedFriendReqIds = ds.getValue(String.class);
+                    receivedReqArrayList.add(receivedFriendReqIds);
+                }
+                // checks if the requester have actually sent the request if the userSignedIn received it
+                if (receivedReqArrayList.contains(strSignedInUID)) {
+                    senderReceiver[1] = true;
+                }
+                else {
+                    senderReceiver[1] = false;
+                }
+            }
 
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
 
+            }
+        });
 
+        // checks if the request exists on the sentRequests of the sender and the receivedRequests of the receiver
+        if (senderReceiver[0] == senderReceiver[1]) {
+            // add them to friends if they both exist
+            DatabaseReference senderAddFriendRef = rootRef.child(accptUID + "/friends");
+            senderAddFriendRef.push().setValue(strSignedInUID);
+            DatabaseReference receiverAddFriendRef = rootRef.child(strSignedInUID + "/friends");
+            receiverAddFriendRef.push().setValue(accptUID);
+        }
     }
 
-    @Override
-    public void acceptFriendRequest() {
+    private void deleteValuesFromRequests(String accptUID, String signedInUID, String aUIDDelete, String sUIDDelete) {
+        final String strSignedInUID = signedInUID;
 
+        DatabaseReference checkSenderReqRef = rootRef.child(accptUID + "/sentFriendRequests");
+        DatabaseReference checkReceiverReqRef = rootRef.child(strSignedInUID + "/receivedFriendRequests");
     }
 
     @Override
