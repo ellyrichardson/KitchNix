@@ -45,17 +45,20 @@ public class SearchResultsAdapter extends  RecyclerView.Adapter<SearchResultsAda
                         String rUsername = userUN.getText().toString();
                         String tmpFullName = "";
                         String tmpUserID = "";
+                        String tmpUsername = "";
 
                         // gets other info of matching user based on username
                         for (int i = 0; i < getItemCount(); i++) {
                             if (users.get(i).getUsername() == rUsername) {
                                 tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
                                 tmpUserID = users.get(i).getUserId() + "";
+                                tmpUsername = users.get(i).getUsername();
                             }
                         }
                         // to pass result values to userFragment
                         args.putString("sRFullName", tmpFullName);
                         args.putString("sRUserID", tmpUserID);
+                        args.putString("sRUsername", tmpUsername);
                         ((MainNavigation) context).userFragment(args);
                     }
 

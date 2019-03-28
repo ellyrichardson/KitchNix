@@ -30,7 +30,8 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
     SharedPreferences.Editor PrefEditor;
     static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences
     String accessToken = "Access Token";
-    String currentUserID = "Current User";
+    String currentUserID = "Current User ID";
+    String currentUsername = "Current Username";
 
     TextView uFullName;
 
@@ -104,6 +105,7 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
         uFullName = (TextView) activity.findViewById(R.id.uFullNameET);
 
         String uStrFullN="";
+        String uStrUserN = "";
         int uID = 0;
 
         try {
@@ -116,6 +118,7 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
                 JSONObject pJObj_data = pJObjArray.getJSONObject(i);
                 // Sets the profile name to the user's full name
                 uStrFullN = pJObj_data.getString("first_name")+ " " + pJObj_data.getString("last_name");
+                uStrUserN = pJObj_data.getString("username");
 
                 // converts user ID to int for security
                 //String tmpInt = pJObj_data.getInt("id") + "";
@@ -131,6 +134,7 @@ public class GetUserInfo extends AsyncTask<String, String, String> {
                 PrefEditor = ShPreference.edit();
                 // to save currentUserID
                 PrefEditor.putInt(currentUserID, uID);
+                PrefEditor.putString(currentUsername, uStrUserN);
                 PrefEditor.commit();
             }
             else if (context != null) {

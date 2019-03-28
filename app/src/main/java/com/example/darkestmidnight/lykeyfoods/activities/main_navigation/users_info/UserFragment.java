@@ -53,7 +53,8 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
     static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences everywhere
-    String currentUserID = "Current User";
+    String currentUserID = "Current User ID";
+    String currentUsername = "Current Username";
 
     TextView sRFullName;
     Button addFriendBtn, sentRequestBtn, acceptRequestBtn, wereFriendsBtn;
@@ -108,13 +109,15 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         wereFriendsBtn = (Button) view.findViewById(R.id.sRUWeFriendsBtn);
 
         final String strVisitedUserID = getArguments().getString("sRUserID");
+        final String visitedUsername = getArguments().getString("sRUsername");
 
         ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
 
         // converts Stringed userID back to Int
-        int userSignedIn = ShPreference.getInt(currentUserID, 0);
+        final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
+        final String signedInUsername = ShPreference.getString(currentUsername, "");
         // converts the userSignedIn id to string
-        final String strSignedInUID = userSignedIn + "";
+        //final String strSignedInUID = userSignedInID + "";
 
         // checks if the current User visited has been sent a friend Request
         checkFriendRequestStatus(new ButtonStatus() {
@@ -147,7 +150,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                     }
                 }
             }
-        }, strSignedInUID, strVisitedUserID);
+        }, strSignedInUID, visitedUsername, strVisitedUserID);
 
         // when the existing Friends button was pressed
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
@@ -157,7 +160,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                 addFriendBtn.setVisibility(View.GONE);
                 acceptRequestBtn.setVisibility(View.GONE);
                 wereFriendsBtn.setVisibility(View.GONE);
-                addToFriends(strVisitedUserID, strSignedInUID);
+                addToFriends(strVisitedUserID, strSignedInUID, visitedUsername, signedInUsername);
             }
         });
         //TODO: Check conflicts on showing status, could be friends but not really
@@ -226,15 +229,17 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     // function to Add Friends
     @Override
-    public void addToFriends(String uVisited, final String uSignedIn) {
+    public void addToFriends(String uVisited, final String uSignedIn, final String visitedUsername, final String signedInUsername) {
         // TODO: change this to actual feature requirements, this is a test only
         // to put the sent request to the logged in user's sentFriendRequests
         DatabaseReference sentFriendReqRef = rootRef.child(uSignedIn + "/sentFriendRequests");
-        sentFriendReqRef.push().setValue(uVisited);
+        //sentFriendReqRef.push().setValue(uVisited);
+        sentFriendReqRef.child(visitedUsername).setValue(uVisited);
 
         // To put the request to addedUser receivedFriendRequests
         DatabaseReference receivedFriendReqRef = rootRef.child(uVisited + "/receivedFriendRequests");
-        receivedFriendReqRef.push().setValue(uSignedIn);
+        //receivedFriendReqRef.push().setValue(uSignedIn);
+        receivedFriendReqRef.child(signedInUsername).setValue(uSignedIn);
     }
 
     @Override
@@ -244,9 +249,9 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         final boolean[] senderReceiver = new boolean[2];
 
         // checks if the id of the receiver exists in the sentFriendRequests of the sender
-        checkSenderReq(receiverID);
+        checkSenderRequest(receiverID);
         // checks if the id of the sender exists in the receivedFriendRequests of the receiver
-        checkReceiverReq(senderID);
+        checkReceiverRequest(senderID);
 
         // checks if the request exists on the sentRequests of the sender and the receivedRequests of the receiver
         if (senderReceiver[0] == senderReceiver[1]) {
@@ -275,20 +280,20 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     }
 
-    private void checkFriendRequestStatus(final ButtonStatus buttonsCallback, final String strSignedInUID, final String strVisitedUserID) {
+    private void checkFriendRequestStatus(final ButtonStatus buttonsCallback, final String strSignedInUID, final String visitedUsername, final String strVisitedUID) {
         final DatabaseReference checkFriendRequestsRef = database.getReference("friend_requests/test/" + strSignedInUID);
         checkFriendRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 // choice is 1 to show buttons, then select which buttons to show with second params
-                if (dataSnapshot.hasChild("/friends/" + strVisitedUserID)) {
+                if (dataSnapshot.child("friends/" + visitedUsername).getValue(String.class) == strVisitedUID) {
                     buttonsCallback.setButtonStatus(1, 1);
                 }
-                else if (dataSnapshot.hasChild("/sentFriendRequest/" + strVisitedUserID)) {
+                else if (dataSnapshot.child("sentFriendRequest/" + visitedUsername).getValue(String.class) == strVisitedUID) {
                     buttonsCallback.setButtonStatus(1, 2);
                 }
-                else if (dataSnapshot.hasChild("/receivedFriendRequests/" + strVisitedUserID)) {
+                else if (dataSnapshot.child("receivedFriendRequests/" + visitedUsername).getValue(String.class) == strVisitedUID) {
                     buttonsCallback.setButtonStatus(1, 3);
                 }
                 else {
@@ -307,7 +312,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * checkSenderReq:
      * Checks if the sender has the id of the receiver in sentFriendRequests
      */
-    private void checkSenderReq (final String receiverID) {
+    private void checkSenderRequest (final String receiverID) {
         DatabaseReference checkSenderReqRef = rootRef.child(receiverID + "/sentFriendRequests");
         checkSenderReqRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
@@ -332,7 +337,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * checkReceiverReq:
      * Checks if the receiver has the id of the sender in receivedFriendRequests
      */
-    private void checkReceiverReq (final String senderID) {
+    private void checkReceiverRequest (final String senderID) {
         DatabaseReference checkReceiverReqRef = rootRef.child(senderID + "/receivedFriendRequests");
 
         checkReceiverReqRef.addListenerForSingleValueEvent(new ValueEventListener() {

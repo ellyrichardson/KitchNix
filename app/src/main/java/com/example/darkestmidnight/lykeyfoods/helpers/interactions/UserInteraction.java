@@ -6,7 +6,7 @@ public class UserInteraction {
         void acceptFriendRequest(String accptUID, String signedInUID);
         void checkIfRequestExist();
         void declineFriendRequest();
-        void addToFriends(String uName, String signedInID);
+        void addToFriends(String uVisited, final String uSignedIn, final String visitedUsername, final String signedInUsernam);
     }
 
     interface ChatRooms {
