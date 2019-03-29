@@ -16,6 +16,7 @@ import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.helpers.interactions.UserInteraction;
 import com.example.darkestmidnight.lykeyfoods.interfaces.FirebaseGetData;
 import com.example.darkestmidnight.lykeyfoods.interfaces.ButtonStatus;
+import com.example.darkestmidnight.lykeyfoods.interfaces.UserFragmentInterfaces.AcceptFriendRequest;
 import com.example.darkestmidnight.lykeyfoods.models.FriendRequestJSON;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -248,10 +249,18 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         // senderReceiver[0] is the sender, senderReceiver[1] is the receiver
         final boolean[] senderReceiver = new boolean[2];
 
+        final String senderUsername = "";
+        String receiverUsername = "";
+
         // checks if the id of the receiver exists in the sentFriendRequests of the sender
         checkSenderRequest(receiverID);
-        // checks if the id of the sender exists in the receivedFriendRequests of the receiver
-        checkReceiverRequest(senderID);
+        // checks if the username of the sender exists in the receivedFriendRequests of the receiver
+        checkReceiverRequest(new AcceptFriendRequest() {
+            @Override
+            public String getUsername(String username) {
+                return  username;
+            }
+        }, "", senderID);
 
         // checks if the request exists on the sentRequests of the sender and the receivedRequests of the receiver
         if (senderReceiver[0] == senderReceiver[1]) {
@@ -287,13 +296,13 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 // choice is 1 to show buttons, then select which buttons to show with second params
-                if (dataSnapshot.child("friends/" + visitedUsername).getValue(String.class) == strVisitedUID) {
+                if (dataSnapshot.hasChild("friends/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 1);
                 }
-                else if (dataSnapshot.child("sentFriendRequest/" + visitedUsername).getValue(String.class) == strVisitedUID) {
+                else if (dataSnapshot.hasChild("sentFriendRequests/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 2);
                 }
-                else if (dataSnapshot.child("receivedFriendRequests/" + visitedUsername).getValue(String.class) == strVisitedUID) {
+                else if (dataSnapshot.hasChild("receivedFriendRequests/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 3);
                 }
                 else {
@@ -337,7 +346,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * checkReceiverReq:
      * Checks if the receiver has the id of the sender in receivedFriendRequests
      */
-    private void checkReceiverRequest (final String senderID) {
+    private void checkReceiverRequest (final AcceptFriendRequest checkReceiverReqCB, String senderID, final String senderUsername) {
         DatabaseReference checkReceiverReqRef = rootRef.child(senderID + "/receivedFriendRequests");
 
         checkReceiverReqRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -350,6 +359,10 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                     // gets ids in the receivedFriendRequests of the receiving user
                     String receivedFriendReqIds = ds.getValue(String.class);
                     receivedReqArrayList.add(receivedFriendReqIds);
+                }
+
+                if (dataSnapshot.hasChild(senderUsername)) { ;
+                        checkReceiverReqCB.getUsername(dataSnapshot.child(senderUsername).getValue(String.class));
                 }
             }
 
