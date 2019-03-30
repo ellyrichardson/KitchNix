@@ -120,20 +120,24 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         final String signedInUsername = ShPreference.getString(currentUsername, "");
 
         // checks if the current User visited has been sent a friend Request and then an appropriate button
+        notShowFriendRequestButtons();
+
+        // sets the friend request buttons on the visits of the profile
         setFriendRequestButtons(strSignedInUID, strVisitedUserID, visitedUsername);
 
         // when the existing Friends button was pressed
         addFriendBtn.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                addToFriends(strVisitedUserID, strSignedInUID, visitedUsername, signedInUsername);
                 sentRequestBtn.setVisibility(View.VISIBLE);
                 addFriendBtn.setVisibility(View.GONE);
                 acceptRequestBtn.setVisibility(View.GONE);
                 wereFriendsBtn.setVisibility(View.GONE);
-                addToFriends(strVisitedUserID, strSignedInUID, visitedUsername, signedInUsername);
+                //setFriendRequestButtons(strSignedInUID, strVisitedUserID, visitedUsername);
             }
         });
-        //TODO: Check conflicts on showing status, could be friends but not really
+
         // when accepting friend request from visited user
         acceptRequestBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -143,6 +147,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                 addFriendBtn.setVisibility(View.GONE);
                 acceptRequestBtn.setVisibility(View.GONE);
                 wereFriendsBtn.setVisibility(View.VISIBLE);
+                //setFriendRequestButtons(strSignedInUID, strVisitedUserID, visitedUsername);
             }
         });
 
@@ -154,6 +159,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                 addFriendBtn.setVisibility(View.VISIBLE);
                 acceptRequestBtn.setVisibility(View.GONE);
                 wereFriendsBtn.setVisibility(View.GONE);
+                //setFriendRequestButtons(strSignedInUID, strVisitedUserID, visitedUsername);
             }
         });
 
@@ -216,6 +222,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     @Override
     public void addToFriends(String uVisited, final String uSignedIn, final String visitedUsername, final String signedInUsername) {
         // TODO: reformat the parameter organization of this function
+        // TODO: should not allow adding self
         // to put the sent request to sender's sentFriendRequests
         addFriendToSentReq(uSignedIn, uVisited, visitedUsername);
         // To put the request to receiver's receivedFriendRequests
@@ -306,7 +313,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     @Override
     public void declineFriendRequest() {
-
+        //TODO: implement this feature
     }
 
     /**
@@ -345,11 +352,6 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         checkFriendRequestStatus(new ButtonStatus() {
             @Override
             public void setButtonStatus(int choice, int button) {
-                addFriendBtn.setVisibility(View.GONE);
-                sentRequestBtn.setVisibility(View.GONE);
-                acceptRequestBtn.setVisibility(View.GONE);
-                wereFriendsBtn.setVisibility(View.GONE);
-
                 // if choosed to show buttons
                 if (choice == 1) {
                     // show buttons depending on the friendRequest status
@@ -368,6 +370,16 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                 }
             }
         }, receiverID, senderUsername, senderID);
+    }
+
+    /**
+     * Mainly called in the onViewCreated
+     * Purpose is to not show buttons initially and let setFriendRequestButtons show it*/
+    private void notShowFriendRequestButtons() {
+        addFriendBtn.setVisibility(View.GONE);
+        sentRequestBtn.setVisibility(View.GONE);
+        acceptRequestBtn.setVisibility(View.GONE);
+        wereFriendsBtn.setVisibility(View.GONE);
     }
 
     /**

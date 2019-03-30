@@ -84,6 +84,7 @@ public class SearchBoxFragment extends Fragment {
 
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState){
+        // TODO: should not allow searching self
         searchBox = (EditText) getActivity().findViewById(R.id.searchTopBar);
         //uUsername = (TextView) getActivity().findViewById(R.id.userUsername);
         getSearcResults = new GetSearchBoxResults(getContext(), getActivity());
@@ -122,16 +123,6 @@ public class SearchBoxFragment extends Fragment {
         }
         mListener = null;
     }
-
-    // so it can be called from the adapter
-    /*public void UserFragment() {
-        frag = UserFragment.newInstance("test1", "test2");
-        if (frag != null) {
-            FragmentTransaction ft = frag.getFragmentManager().beginTransaction();
-            ft.replace(R.id.fragmentContainer, frag, frag.getTag());
-            ft.commit();
-        }
-    }*/
 
     /**
      * This interface must be implemented by activities that contain this
