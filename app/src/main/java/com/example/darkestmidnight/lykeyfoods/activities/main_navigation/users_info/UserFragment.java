@@ -54,7 +54,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     String currentUserID = "Current User ID";
     String currentUsername = "Current Username";
 
-    TextView sRFullName;
+    TextView sRFullName, sRUUsername;
     Button addFriendBtn, sentRequestBtn, acceptRequestBtn, wereFriendsBtn;
 
     private OnFragmentInteractionListener mListener;
@@ -101,6 +101,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     public void onViewCreated(View view, Bundle savedInstanceState){
         //TODO: Refactor button status when buttons are pressed inside this function.
         sRFullName = (TextView) view.findViewById(R.id.sRUFullNameET);
+        sRUUsername = (TextView) view.findViewById(R.id.sRUUsernameET);
 
         addFriendBtn = (Button) view.findViewById(R.id.sRUAddFriendBtn);
         sentRequestBtn = (Button) view.findViewById(R.id.sRUFriendReqSentBtn);
@@ -162,6 +163,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
         // sets the name with the Full Name; called from SearchResultsAdapter
         sRFullName.setText(getArguments().getString("sRFullName"));
+        sRUUsername.setText(visitedUsername);
     }
 
     // TODO: Rename method, update argument and hook method into UI event

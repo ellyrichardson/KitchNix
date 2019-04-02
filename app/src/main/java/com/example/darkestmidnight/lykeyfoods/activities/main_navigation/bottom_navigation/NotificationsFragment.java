@@ -3,12 +3,22 @@ package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.bottom
 import android.content.Context;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.darkestmidnight.lykeyfoods.R;
+import com.example.darkestmidnight.lykeyfoods.models.Notifications;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -29,6 +39,9 @@ public class NotificationsFragment extends Fragment {
     private String mParam2;
 
     private OnFragmentInteractionListener mListener;
+
+    final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+    DatabaseReference notifRef = firebase.getReference("notifications/users");
 
     public NotificationsFragment() {
         // Required empty public constructor
@@ -102,5 +115,42 @@ public class NotificationsFragment extends Fragment {
     public interface OnFragmentInteractionListener {
         // TODO: Update argument type and name
         void onFragmentInteraction(Uri uri);
+    }
+
+    private void getUserNotifications(final String userID) {
+
+    }
+
+    /**
+     * Async for retrieving notifications from Firebase
+     * PARAMS:
+     * userID is the id of the current user signed in
+     * receivedNotifFrom is the username of the user who the current user received a notification from
+     **/
+    private void retrieveNotifFromFireb(ProcessNotifData notifData, String userID, final String receivedNotifFrom, String notifType) {
+        final String finalNotifType = notifType;
+        DatabaseReference retrieveNotifRef = notifRef.child(finalNotifType + "/" + receivedNotifFrom);
+
+        retrieveNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<Notifications> notifList = new ArrayList<>();
+                //Notifications notifReqIds = new Notifications();
+                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                    //Notifications notifReqIds = ds.getValue(String.class);
+                    //notifList.add(notifReqIds);
+                }
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    private interface ProcessNotifData {
+        void putNotifDataToRecycView(List<Notifications> notif, final String userID, final String receivedNotifFrom, String notifType);
     }
 }
