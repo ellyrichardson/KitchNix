@@ -129,9 +129,9 @@ public class NotificationsFragment extends Fragment {
      **/
     private void retrieveNotifFromFireb(ProcessNotifData notifData, String userID, final String receivedNotifFrom, String notifType) {
         final String finalNotifType = notifType;
-        DatabaseReference retrieveNotifRef = notifRef.child(finalNotifType + "/" + receivedNotifFrom);
+        //DatabaseReference retrieveNotifRef = notifRef.child(finalNotifType + "/" + receivedNotifFrom);
 
-        retrieveNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        notifRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<Notifications> notifList = new ArrayList<>();
