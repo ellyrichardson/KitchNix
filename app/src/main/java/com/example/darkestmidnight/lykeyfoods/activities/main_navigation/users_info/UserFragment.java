@@ -23,6 +23,9 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.reflect.Field;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * A simple {@link Fragment} subclass.
@@ -44,9 +47,9 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     // to reference the base friend requests path
-    DatabaseReference friendReqRef = database.getReference("friend_requests/users");
+    DatabaseReference friendReqRef = database.getReference("friend_requests/test");
     // to reference the base notifications path after accepting or sending requests
-    DatabaseReference notifRef = database.getReference("notifications/users");
+    DatabaseReference notifRef = database.getReference("notifications/test");
 
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
@@ -252,6 +255,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     /**
      * acceptFriendRequest:
+     * Mainly called under button press in onViewCreated()
      * Uses AcceptFriendRequest Interface for the callback of Firebase Async checkReceiverRequest
      */
     @Override
@@ -292,6 +296,8 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                 sendAcceptedReqNotifRef.child(receiverUsername).child("status").setValue("unopened");
             }
         }, receiverID, senderID, receiverUsername, senderUsername);
+
+        acceptedFriendRequestNotification(receiverID, senderID, receiverUsername);
     }
 
     /**
@@ -428,8 +434,18 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * Will send a notifcation to the receiving user about the friend request
      **/
     private void sendFriendRequestNotification(final String receiverID, final String senderID, final String senderUsername) {
+        String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
         DatabaseReference sentRequestNotifRef = notifRef.child(receiverID + "/sentFriendReqNotif");
         sentRequestNotifRef.child(senderUsername).child("id").setValue(senderID);
         sentRequestNotifRef.child(senderUsername).child("status").setValue("unopened");
+        sentRequestNotifRef.child(senderUsername).child("date").setValue(currentDateandTime);
+    }
+
+    private void acceptedFriendRequestNotification(final String receiverID, final String senderID, final String receiverUsername) {
+        String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
+        DatabaseReference sentRequestNotifRef = notifRef.child(senderID + "/acceptedFriendReqNotif");
+        sentRequestNotifRef.child(receiverUsername).child("id").setValue(senderID);
+        sentRequestNotifRef.child(receiverUsername).child("status").setValue("unopened");
+        sentRequestNotifRef.child(receiverUsername).child("date").setValue(currentDateandTime);
     }
 }

@@ -128,17 +128,19 @@ public class NotificationsFragment extends Fragment {
      * receivedNotifFrom is the username of the user who the current user received a notification from
      **/
     private void retrieveNotifFromFireb(ProcessNotifData notifData, String userID, final String receivedNotifFrom, String notifType) {
-        final String finalNotifType = notifType;
-        //DatabaseReference retrieveNotifRef = notifRef.child(finalNotifType + "/" + receivedNotifFrom);
+        //final String finalNotifType = notifType;
+        DatabaseReference retrieveNotifRef = notifRef.child(userID);
 
-        notifRef.addListenerForSingleValueEvent(new ValueEventListener() {
+        retrieveNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                List<Notifications> notifList = new ArrayList<>();
+                List<Notifications> acceptReqNotifList = new ArrayList<>();
+                List<Notifications> friendReqNotifList = new ArrayList<>();
                 //Notifications notifReqIds = new Notifications();
                 for (DataSnapshot ds : dataSnapshot.getChildren()) {
                     //Notifications notifReqIds = ds.getValue(String.class);
                     //notifList.add(notifReqIds);
+                    //String frndReqNotifSenderID = ds.child("sentFriendReqNotif").child()
                 }
 
             }
@@ -152,5 +154,8 @@ public class NotificationsFragment extends Fragment {
 
     private interface ProcessNotifData {
         void putNotifDataToRecycView(List<Notifications> notif, final String userID, final String receivedNotifFrom, String notifType);
+        void getNotifUserID(int notifType);
+        void getNotifUsername(int notifType);
+        void getNotifDateTime(int notifType);
     }
 }
