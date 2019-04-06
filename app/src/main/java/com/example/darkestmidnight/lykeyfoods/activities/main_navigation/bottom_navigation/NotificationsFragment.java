@@ -10,7 +10,9 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.darkestmidnight.lykeyfoods.R;
+import com.example.darkestmidnight.lykeyfoods.interfaces.RetrivUserRecivFriendReq;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
+import com.example.darkestmidnight.lykeyfoods.models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -28,6 +30,7 @@ import java.util.List;
  * Use the {@link NotificationsFragment#newInstance} factory method to
  * create an instance of this fragment.
  */
+//TODO: Fix connection leakage with http
 public class NotificationsFragment extends Fragment {
     // TODO: Rename parameter arguments, choose names that match
     // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
@@ -41,7 +44,7 @@ public class NotificationsFragment extends Fragment {
     private OnFragmentInteractionListener mListener;
 
     final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
-    DatabaseReference notifRef = firebase.getReference("notifications/users");
+    DatabaseReference rootRef = firebase.getReference("users");
 
     public NotificationsFragment() {
         // Required empty public constructor
@@ -118,7 +121,40 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void getUserNotifications(final String userID) {
+        final List<String> receivedFriendReq = new ArrayList<>();
 
+        retrieveReceivedFriendReqIds(new RetrivUserRecivFriendReq() {
+            @Override
+            public void setRetrievedRecivReqIds(List<String> array) {
+                //TODO: set the empty List string above with this!
+                receivedFriendReq.addAll(array);
+            }
+        }, userID);
+
+        if (!receivedFriendReq.isEmpty()) {
+            //TODO: do the main notification retrieval here? FIX THIS!
+            retrieveSentFriendReqNotif(new ProcessNotifData() {
+                @Override
+                public void putNotifDataToRecycView(List<Notifications> notif, String userID, String receivedNotifFrom, String notifType) {
+
+                }
+
+                @Override
+                public void getNotifDateTime(int notifType) {
+
+                }
+
+                @Override
+                public void getNotifUserID(int notifType) {
+
+                }
+
+                @Override
+                public void getNotifUsername(int notifType) {
+
+                }
+            }, "place holder", "place holder", receivedFriendReq);
+        }
     }
 
     /**
@@ -127,17 +163,20 @@ public class NotificationsFragment extends Fragment {
      * userID is the id of the current user signed in
      * receivedNotifFrom is the username of the user who the current user received a notification from
      **/
-    private void retrieveNotifFromFireb(ProcessNotifData notifData, String userID, final String receivedNotifFrom, String notifType) {
+    private void retrieveSentFriendReqNotif(ProcessNotifData notifData, final String userID, final String receivedNotifFrom, List<String> reqIdsList) {
+        //TODO: clean this mess! ProcessNotifData interface, is that final? or can be changed
         //final String finalNotifType = notifType;
-        DatabaseReference retrieveNotifRef = notifRef.child(userID);
+        DatabaseReference retrieveNotifRef = rootRef.child(userID);
 
         retrieveNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                //TODO: update this! instead of using username in Firebase, use IDS!
                 List<Notifications> acceptReqNotifList = new ArrayList<>();
                 List<Notifications> friendReqNotifList = new ArrayList<>();
-                //Notifications notifReqIds = new Notifications();
-                for (DataSnapshot ds : dataSnapshot.getChildren()) {
+                //Notifications sentReqNotifReqIds = new Notifications();
+                for (DataSnapshot ds : dataSnapshot.child("friend_requests/receivedFriendRequests/" + receivedNotifFrom).getChildren()) {
+
                     //Notifications notifReqIds = ds.getValue(String.class);
                     //notifList.add(notifReqIds);
                     //String frndReqNotifSenderID = ds.child("sentFriendReqNotif").child()
@@ -150,6 +189,46 @@ public class NotificationsFragment extends Fragment {
 
             }
         });
+    }
+
+    /**
+     * Mainly called in getUserNotifications()
+     * Retrieves ids from the receivedFriendRequests of the user
+     **/
+    private void retrieveReceivedFriendReqIds(final RetrivUserRecivFriendReq retrivFriendReq, final String currentUserID) {
+        DatabaseReference sentReceivedReqIdsRef = rootRef.child(currentUserID + "/friend_requests/receivedFriendRequests");
+
+        sentReceivedReqIdsRef.addListenerForSingleValueEvent(new ValueEventListener() {
+            @Override
+            public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                List<String> receivedFriendReqIds = new ArrayList<>();
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    receivedFriendReqIds.add(ds.getValue(String.class));
+                }
+                retrivFriendReq.setRetrievedRecivReqIds(receivedFriendReqIds);
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError databaseError) {
+
+            }
+        });
+    }
+
+    /** This code will probably be deleted*/
+    private User associateUserAttributesToIds(List<String> retrievedIds) {
+        User userAttr;
+
+        //TODO: this here is a place holder so it dont throw an error, FIX THIS!
+        userAttr = new User("fn", "ln", "zn", "asdasd", 1);
+
+        //TODO: probably have an asyncTask here to retrieve information of the user at the web server
+
+        for (int i = 0; i < retrievedIds.size(); i++) {
+            //userAttr = new User()
+        }
+
+        return userAttr;
     }
 
     private interface ProcessNotifData {

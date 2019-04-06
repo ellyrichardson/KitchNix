@@ -7,5 +7,5 @@ public interface AcceptFriendRequest {
     void addToReceiverFriendsList(final String receiverID, final String senderID, final String senderUsername);
     void removeFromSentRequest(final String senderID, final String receiverUsername);
     void removeFromReceivedRequest(final String receiverID, final String senderUsername);
-    void sendAcceptedRequestNotif(final String receiverID, final String senderID, final String receiverUsername);
+    //void sendAcceptedRequestNotif(final String receiverID, final String senderID, final String receiverUsername);
 }

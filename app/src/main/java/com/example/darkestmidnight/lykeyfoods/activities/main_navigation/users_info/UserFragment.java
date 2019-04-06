@@ -47,9 +47,10 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
 
     final FirebaseDatabase database = FirebaseDatabase.getInstance();
     // to reference the base friend requests path
-    DatabaseReference friendReqRef = database.getReference("friend_requests/test");
+    //DatabaseReference friendReqRef = database.getReference("friend_requests/test");
+    DatabaseReference rootRef = database.getReference("users");
     // to reference the base notifications path after accepting or sending requests
-    DatabaseReference notifRef = database.getReference("notifications/test");
+    //DatabaseReference notifRef = database.getReference("notifications/test");
 
     SharedPreferences ShPreference;
     SharedPreferences.Editor PrefEditor;
@@ -238,7 +239,8 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      **/
     private void addFriendToSentReq(final String senderID, final String receiverID, final String receiverUsername) {
         // to put the sent request to the logged in user's sentFriendRequests
-        DatabaseReference senderSentFriendReqRef = friendReqRef.child(senderID + "/sentFriendRequests");
+        //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
+        DatabaseReference senderSentFriendReqRef = rootRef.child(senderID + "/friend_requests/sentFriendRequests");
         //sentFriendReqRef.push().setValue(uVisited);
         senderSentFriendReqRef.child(receiverUsername).setValue(receiverID);
     }
@@ -248,7 +250,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      **/
     private void addFriendToRecReq(final String receiverID, final String senderID, final String senderUsername) {
         // To put the request to addedUser receivedFriendRequests
-        DatabaseReference receiverReceivedFriendReqRef = friendReqRef.child(receiverID + "/receivedFriendRequests");
+        DatabaseReference receiverReceivedFriendReqRef = rootRef.child(receiverID + "/friend_requests/receivedFriendRequests");
         //receivedFriendReqRef.push().setValue(uSignedIn);
         receiverReceivedFriendReqRef.child(senderUsername).setValue(senderID);
     }
@@ -264,37 +266,37 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
             @Override
             public void addToSenderFriendsList(final String cbSenderID, final String cbReceiverID, final String cbReceiverUsername) {
                 // adds the receiver to the friends list of the sender
-                DatabaseReference senderAddToFriendsRef = friendReqRef.child(cbSenderID + "/friends");
+                DatabaseReference senderAddToFriendsRef = rootRef.child(cbSenderID + "/friend_requests/friends");
                 senderAddToFriendsRef.child(cbReceiverUsername).setValue(cbReceiverID);
             }
 
             @Override
             public void addToReceiverFriendsList(final String cbReceiverID, final String cbSenderID, final String cbSenderUsername) {
                 // adds the sender to the friends list of the receiver
-                DatabaseReference receiverAddToFriendsRef = friendReqRef.child(cbReceiverID + "/friends");
+                DatabaseReference receiverAddToFriendsRef = rootRef.child(cbReceiverID + "/friend_requests/friends");
                 receiverAddToFriendsRef.child(cbSenderUsername).setValue((cbSenderID));
             }
 
             @Override
             public void removeFromSentRequest(final String cbSenderID, final String cbReceiverUsername) {
                 // removes the user from sentRequest list of the sender
-                DatabaseReference removeFromSentRequestsRef = friendReqRef.child(cbSenderID + "/sentFriendRequests");
+                DatabaseReference removeFromSentRequestsRef = rootRef.child(cbSenderID + "/friend_requests/sentFriendRequests");
                 removeFromSentRequestsRef.child(cbReceiverUsername).removeValue();
             }
 
             @Override
             public void removeFromReceivedRequest(final String cbReceiverID, final String cbSenderUsername) {
                 // removes the sender from the receivedRequests of the current user
-                DatabaseReference removeFromReceivedRequestsRef = friendReqRef.child(cbReceiverID + "/receivedFriendRequests");
+                DatabaseReference removeFromReceivedRequestsRef = rootRef.child(cbReceiverID + "/friend_requests/receivedFriendRequests");
                 removeFromReceivedRequestsRef.child(cbSenderUsername).removeValue();
             }
 
-            @Override
+            /*@Override
             public void sendAcceptedRequestNotif(String receiverID, String senderID, String receiverUsername) {
-                DatabaseReference sendAcceptedReqNotifRef = notifRef.child(senderID + "/acceptedFriendReqNotif");
+                DatabaseReference sendAcceptedReqNotifRef = rootRef.child(senderID + "notifications/acceptedFriendReqNotif");
                 sendAcceptedReqNotifRef.child(receiverUsername).child("id").setValue(receiverID);
                 sendAcceptedReqNotifRef.child(receiverUsername).child("status").setValue("unopened");
-            }
+            }*/
         }, receiverID, senderID, receiverUsername, senderUsername);
 
         acceptedFriendRequestNotification(receiverID, senderID, receiverUsername);
@@ -305,7 +307,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * changes request statuses of both receiver and sender by removing requests and adding friends to their lists
      */
     private void changeRequestStatus (final AcceptFriendRequest checkReceiverReqCB, final String receiverID, final String senderID, final String receiverUsername, final String senderUsername) {
-        DatabaseReference checkReceiverReqRef = friendReqRef.child(receiverID + "/receivedFriendRequests");
+        DatabaseReference checkReceiverReqRef = rootRef.child(receiverID + "/friend_requests/receivedFriendRequests");
         checkReceiverReqRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
@@ -315,7 +317,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
                     checkReceiverReqCB.addToReceiverFriendsList(receiverID, senderID, senderUsername);
                     checkReceiverReqCB.removeFromSentRequest(senderID, receiverUsername);
                     checkReceiverReqCB.removeFromReceivedRequest(receiverID, senderUsername);
-                    checkReceiverReqCB.sendAcceptedRequestNotif(receiverID, senderID, receiverUsername);
+                    //checkReceiverReqCB.sendAcceptedRequestNotif(receiverID, senderID, receiverUsername);
                 }
             }
 
@@ -346,7 +348,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * Mainly called under removeFriend
      **/
     private void removeFriendInDeleter(final String deleterID, final String toBeDeletedUsername) {
-        DatabaseReference removeFriendInDeleterRef = friendReqRef.child(deleterID + "/friends");
+        DatabaseReference removeFriendInDeleterRef = rootRef.child(deleterID + "/friend_requests/friends");
         removeFriendInDeleterRef.child(toBeDeletedUsername).removeValue();
     }
 
@@ -354,7 +356,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * Mainly called under removeFriend
      **/
     private void removeFriendInToBeDel(final String toBeDeletedID, final String deleterUsername) {
-        DatabaseReference removeFriendInToBeDelRef = friendReqRef.child(toBeDeletedID + "/friends");
+        DatabaseReference removeFriendInToBeDelRef = rootRef.child(toBeDeletedID + "/friend_requests/friends");
         removeFriendInToBeDelRef.child(deleterUsername).removeValue();
     }
 
@@ -402,19 +404,19 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      * Will check the firebase for setting appropriate buttons
      **/
     private void checkFriendRequestStatus(final ButtonStatus buttonsCallback, final String strSignedInUID, final String visitedUsername) {
-        final DatabaseReference checkFriendRequestsRef = friendReqRef.child(strSignedInUID);
+        final DatabaseReference checkFriendRequestsRef = rootRef.child(strSignedInUID);
         checkFriendRequestsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
 
                 // choice is 1 to show buttons, then select which buttons to show with second params
-                if (dataSnapshot.hasChild("friends/" + visitedUsername)) {
+                if (dataSnapshot.hasChild("friend_requests/friends/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 1);
                 }
-                else if (dataSnapshot.hasChild("sentFriendRequests/" + visitedUsername)) {
+                else if (dataSnapshot.hasChild("friend_requests/sentFriendRequests/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 2);
                 }
-                else if (dataSnapshot.hasChild("receivedFriendRequests/" + visitedUsername)) {
+                else if (dataSnapshot.hasChild("friend_requests/receivedFriendRequests/" + visitedUsername)) {
                     buttonsCallback.setButtonStatus(1, 3);
                 }
                 else {
@@ -435,16 +437,20 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
      **/
     private void sendFriendRequestNotification(final String receiverID, final String senderID, final String senderUsername) {
         String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
-        DatabaseReference sentRequestNotifRef = notifRef.child(receiverID + "/sentFriendReqNotif");
+        DatabaseReference sentRequestNotifRef = rootRef.child(receiverID + "/notifications/sentFriendReqNotif");
         sentRequestNotifRef.child(senderUsername).child("id").setValue(senderID);
         sentRequestNotifRef.child(senderUsername).child("status").setValue("unopened");
         sentRequestNotifRef.child(senderUsername).child("date").setValue(currentDateandTime);
     }
 
+    /**
+     * Mainly called in acceptFriendRequest()
+     * Will send a notifcation to the sender of the friend request about the acceptance
+     **/
     private void acceptedFriendRequestNotification(final String receiverID, final String senderID, final String receiverUsername) {
         String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
-        DatabaseReference sentRequestNotifRef = notifRef.child(senderID + "/acceptedFriendReqNotif");
-        sentRequestNotifRef.child(receiverUsername).child("id").setValue(senderID);
+        DatabaseReference sentRequestNotifRef = rootRef.child(senderID + "/notifications/acceptedFriendReqNotif");
+        sentRequestNotifRef.child(receiverUsername).child("id").setValue(receiverID);
         sentRequestNotifRef.child(receiverUsername).child("status").setValue("unopened");
         sentRequestNotifRef.child(receiverUsername).child("date").setValue(currentDateandTime);
     }
