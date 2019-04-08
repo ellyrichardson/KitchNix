@@ -10,4 +10,10 @@
 
     <!-- TODO: Update blank fragment layout -->
 
+    <android.support.v7.widget.RecyclerView
+        android:id="@+id/notifRcyclrView"
+        android:layout_width="match_parent"
+        android:layout_height="658dp"
+        android:layout_alignParentBottom="true"
+        android:layout_alignParentEnd="true" />
 </RelativeLayout>

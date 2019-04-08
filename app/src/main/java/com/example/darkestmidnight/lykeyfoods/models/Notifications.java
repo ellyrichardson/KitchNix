@@ -3,32 +3,34 @@ package com.example.darkestmidnight.lykeyfoods.models;
 import java.util.Date;
 
 public class Notifications {
-    int id, type;
+    //int id;
+    String type;
     String username;
     String postName;
     String userPicture;
     Date dateTime;
 
-    public Notifications(int id, int type, String username, Date dateTime) {
-        this.id = id;
+
+    public Notifications(String type, String username, Date dateTime) {
+        //this.id = id;
         this.type = type;
         this.username = username;
         this.dateTime = dateTime;
     }
 
-    public Notifications(int id, int type, String username, String postName, Date dateTime) {
-        this.id = id;
-        this.type = id;
+    public Notifications(String type, String username, String postName, Date dateTime) {
+        //this.id = id;
+        this.type = type;
         this.username = username;
         this.postName = postName;
         this.dateTime = dateTime;
     }
 
-    public int getNotificationId() {
-        return this.id;
-    }
+    /*public int getNotificationId() {
+        //return this.id;
+    }*/
 
-    public int getNotificationType() {
+    public String getNotificationType() {
         return this.type;
     }
     

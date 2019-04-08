@@ -5,11 +5,15 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
+import android.support.v7.widget.DefaultItemAnimator;
+import android.support.v7.widget.LinearLayoutManager;
+import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.darkestmidnight.lykeyfoods.R;
+import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.ShowNotificationsAdapter;
 import com.example.darkestmidnight.lykeyfoods.interfaces.RetrivUserRecivFriendReq;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
 import com.example.darkestmidnight.lykeyfoods.models.User;
@@ -20,6 +24,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -136,22 +141,16 @@ public class NotificationsFragment extends Fragment {
             retrieveSentFriendReqNotif(new ProcessNotifData() {
                 @Override
                 public void putNotifDataToRecycView(List<Notifications> notif, String userID, String receivedNotifFrom, String notifType) {
+                    RecyclerView notificationsRecycVw;
+                    ShowNotificationsAdapter notificationsAdapter;
 
-                }
-
-                @Override
-                public void getNotifDateTime(int notifType) {
-
-                }
-
-                @Override
-                public void getNotifUserID(int notifType) {
-
-                }
-
-                @Override
-                public void getNotifUsername(int notifType) {
-
+                    notificationsAdapter = new ShowNotificationsAdapter(notif);
+                    RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
+                    notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
+                    notificationsRecycVw.setLayoutManager(nLayoutManager);
+                    notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
+                    notificationsRecycVw.setAdapter(notificationsAdapter);
+                    notificationsAdapter.notifyDataSetChanged();
                 }
             }, "place holder", "place holder", receivedFriendReq);
         }
@@ -163,7 +162,7 @@ public class NotificationsFragment extends Fragment {
      * userID is the id of the current user signed in
      * receivedNotifFrom is the username of the user who the current user received a notification from
      **/
-    private void retrieveSentFriendReqNotif(ProcessNotifData notifData, final String userID, final String receivedNotifFrom, List<String> reqIdsList) {
+    private void retrieveSentFriendReqNotif(ProcessNotifData notifData, final String userID, final String receivedNotifFrom, final List<String> recivReqIdsList) {
         //TODO: clean this mess! ProcessNotifData interface, is that final? or can be changed
         //final String finalNotifType = notifType;
         DatabaseReference retrieveNotifRef = rootRef.child(userID);
@@ -171,17 +170,16 @@ public class NotificationsFragment extends Fragment {
         retrieveNotifRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                //TODO: update this! instead of using username in Firebase, use IDS!
+                int dsIterator = 0;
                 List<Notifications> acceptReqNotifList = new ArrayList<>();
                 List<Notifications> friendReqNotifList = new ArrayList<>();
                 //Notifications sentReqNotifReqIds = new Notifications();
                 for (DataSnapshot ds : dataSnapshot.child("friend_requests/receivedFriendRequests/" + receivedNotifFrom).getChildren()) {
-
-                    //Notifications notifReqIds = ds.getValue(String.class);
-                    //notifList.add(notifReqIds);
-                    //String frndReqNotifSenderID = ds.child("sentFriendReqNotif").child()
+                    if (ds.hasChild(String.valueOf(dsIterator))) {
+                        friendReqNotifList.add(new Notifications(ds.child(recivReqIdsList.get(dsIterator)).child("type").getValue(String.class), ds.child(recivReqIdsList.get(dsIterator)).child("username").getValue(String.class), ds.child(recivReqIdsList.get(dsIterator)).child("date").getValue(Date.class)));
+                        dsIterator++;
+                    }
                 }
-
             }
 
             @Override
@@ -215,26 +213,7 @@ public class NotificationsFragment extends Fragment {
         });
     }
 
-    /** This code will probably be deleted*/
-    private User associateUserAttributesToIds(List<String> retrievedIds) {
-        User userAttr;
-
-        //TODO: this here is a place holder so it dont throw an error, FIX THIS!
-        userAttr = new User("fn", "ln", "zn", "asdasd", 1);
-
-        //TODO: probably have an asyncTask here to retrieve information of the user at the web server
-
-        for (int i = 0; i < retrievedIds.size(); i++) {
-            //userAttr = new User()
-        }
-
-        return userAttr;
-    }
-
     private interface ProcessNotifData {
-        void putNotifDataToRecycView(List<Notifications> notif, final String userID, final String receivedNotifFrom, String notifType);
-        void getNotifUserID(int notifType);
-        void getNotifUsername(int notifType);
-        void getNotifDateTime(int notifType);
+        void putNotifDataToRecycView(List<Notifications> notif, final String userID, final String receivedNotifFrom, String notifType);;
     }
 }

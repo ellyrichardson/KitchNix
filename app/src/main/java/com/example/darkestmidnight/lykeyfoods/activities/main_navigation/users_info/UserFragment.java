@@ -438,9 +438,9 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private void sendFriendRequestNotification(final String receiverID, final String senderID, final String senderUsername) {
         String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
         DatabaseReference sentRequestNotifRef = rootRef.child(receiverID + "/notifications/sentFriendReqNotif");
-        sentRequestNotifRef.child(senderUsername).child("id").setValue(senderID);
-        sentRequestNotifRef.child(senderUsername).child("status").setValue("unopened");
-        sentRequestNotifRef.child(senderUsername).child("date").setValue(currentDateandTime);
+        sentRequestNotifRef.child(senderID).child("username").setValue(senderUsername);
+        sentRequestNotifRef.child(senderID).child("status").setValue("unopened");
+        sentRequestNotifRef.child(senderID).child("date").setValue(currentDateandTime);
     }
 
     /**
@@ -450,8 +450,9 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private void acceptedFriendRequestNotification(final String receiverID, final String senderID, final String receiverUsername) {
         String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
         DatabaseReference sentRequestNotifRef = rootRef.child(senderID + "/notifications/acceptedFriendReqNotif");
-        sentRequestNotifRef.child(receiverUsername).child("id").setValue(receiverID);
-        sentRequestNotifRef.child(receiverUsername).child("status").setValue("unopened");
-        sentRequestNotifRef.child(receiverUsername).child("date").setValue(currentDateandTime);
+        sentRequestNotifRef.child(receiverID).child("id").setValue(receiverUsername);
+        sentRequestNotifRef.child(receiverID).child("status").setValue("unopened");
+        sentRequestNotifRef.child(receiverID).child("date").setValue(currentDateandTime);
+        sentRequestNotifRef.child(receiverID).child("type").setValue(0);
     }
 }
