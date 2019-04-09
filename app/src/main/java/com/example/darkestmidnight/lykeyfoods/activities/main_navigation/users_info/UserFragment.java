@@ -53,7 +53,6 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     //DatabaseReference notifRef = database.getReference("notifications/test");
 
     SharedPreferences ShPreference;
-    SharedPreferences.Editor PrefEditor;
     static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences everywhere
     String currentUserID = "Current User ID";
     String currentUsername = "Current Username";

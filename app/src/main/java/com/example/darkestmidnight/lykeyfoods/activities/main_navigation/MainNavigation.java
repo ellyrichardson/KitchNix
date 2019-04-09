@@ -108,9 +108,9 @@ public class MainNavigation extends AppCompatActivity {
             case R.id.nav_home_btn:
                 frag = HomeFragment.newInstance("test1", "test2");
                 break;
-            case R.id.nav_message_btn:
+           /* case R.id.nav_message_btn:
                 frag = MessagesFragment.newInstance("test1", "test2");
-                break;
+                break;*/
             case R.id.nav_notif_btn:
                 frag = NotificationsFragment.newInstance("test1", "test2");
                 break;

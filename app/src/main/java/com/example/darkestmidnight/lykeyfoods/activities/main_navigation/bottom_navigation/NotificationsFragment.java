@@ -1,6 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.bottom_navigation;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -51,6 +52,10 @@ public class NotificationsFragment extends Fragment {
     final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
     DatabaseReference rootRef = firebase.getReference("users");
 
+    SharedPreferences ShPreference;
+    static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences everywhere
+    String currentUserID = "Current User ID";
+
     public NotificationsFragment() {
         // Required empty public constructor
     }
@@ -87,6 +92,15 @@ public class NotificationsFragment extends Fragment {
                              Bundle savedInstanceState) {
         // Inflate the layout for this fragment
         return inflater.inflate(R.layout.fragment_notifications, container, false);
+    }
+
+    @Override
+    public void onViewCreated(View view, Bundle savedInstanceState){
+        ShPreference = getActivity().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+
+        // converts the userSignedIn id to string
+        final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
+        getUserNotifications(strSignedInUID);
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -126,8 +140,24 @@ public class NotificationsFragment extends Fragment {
     }
 
     private void getUserNotifications(final String userID) {
-        final List<String> receivedFriendReq = new ArrayList<>();
+        retrieveSentFriendReqNotif(new ProcessNotifData() {
+            @Override
+            public void putNotifDataToRecycView(List<Notifications> notif) {
+                RecyclerView notificationsRecycVw;
+                ShowNotificationsAdapter notificationsAdapter;
 
+                notificationsAdapter = new ShowNotificationsAdapter(notif);
+                RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
+                notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
+                notificationsRecycVw.setLayoutManager(nLayoutManager);
+                notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
+                notificationsRecycVw.setAdapter(notificationsAdapter);
+                notificationsAdapter.notifyDataSetChanged();
+            }
+        }, userID);
+
+        /*
+        final List<String> receivedFriendReq = new ArrayList<>();
         retrieveReceivedFriendReqIds(new RetrivUserRecivFriendReq() {
             @Override
             public void setRetrievedRecivReqIds(List<String> array) {
@@ -140,7 +170,7 @@ public class NotificationsFragment extends Fragment {
             //TODO: do the main notification retrieval here? FIX THIS!
             retrieveSentFriendReqNotif(new ProcessNotifData() {
                 @Override
-                public void putNotifDataToRecycView(List<Notifications> notif, String userID, String receivedNotifFrom, String notifType) {
+                public void putNotifDataToRecycView(List<Notifications> notif) {
                     RecyclerView notificationsRecycVw;
                     ShowNotificationsAdapter notificationsAdapter;
 
@@ -152,8 +182,8 @@ public class NotificationsFragment extends Fragment {
                     notificationsRecycVw.setAdapter(notificationsAdapter);
                     notificationsAdapter.notifyDataSetChanged();
                 }
-            }, "place holder", "place holder", receivedFriendReq);
-        }
+            }, userID);
+        }*/
     }
 
     /**
@@ -162,7 +192,7 @@ public class NotificationsFragment extends Fragment {
      * userID is the id of the current user signed in
      * receivedNotifFrom is the username of the user who the current user received a notification from
      **/
-    private void retrieveSentFriendReqNotif(ProcessNotifData notifData, final String userID, final String receivedNotifFrom, final List<String> recivReqIdsList) {
+    private void retrieveSentFriendReqNotif(final ProcessNotifData notifData, final String userID) {
         //TODO: clean this mess! ProcessNotifData interface, is that final? or can be changed
         //final String finalNotifType = notifType;
         DatabaseReference retrieveNotifRef = rootRef.child(userID);
@@ -174,12 +204,15 @@ public class NotificationsFragment extends Fragment {
                 List<Notifications> acceptReqNotifList = new ArrayList<>();
                 List<Notifications> friendReqNotifList = new ArrayList<>();
                 //Notifications sentReqNotifReqIds = new Notifications();
-                for (DataSnapshot ds : dataSnapshot.child("friend_requests/receivedFriendRequests/" + receivedNotifFrom).getChildren()) {
+                for (DataSnapshot ds : dataSnapshot.child("notifications/sentFriendReqNotif").getChildren()) {
                     if (ds.hasChild(String.valueOf(dsIterator))) {
-                        friendReqNotifList.add(new Notifications(ds.child(recivReqIdsList.get(dsIterator)).child("type").getValue(String.class), ds.child(recivReqIdsList.get(dsIterator)).child("username").getValue(String.class), ds.child(recivReqIdsList.get(dsIterator)).child("date").getValue(Date.class)));
-                        dsIterator++;
+                        friendReqNotifList.add(new Notifications(ds.child(String.valueOf(dsIterator)).child("type").getValue(String.class),
+                                ds.child(String.valueOf(dsIterator)).child("username").getValue(String.class),
+                                ds.child(String.valueOf(dsIterator)).child("date").getValue(Date.class)));
                     }
+                    dsIterator++;
                 }
+                notifData.putNotifDataToRecycView(friendReqNotifList);
             }
 
             @Override
@@ -214,6 +247,6 @@ public class NotificationsFragment extends Fragment {
     }
 
     private interface ProcessNotifData {
-        void putNotifDataToRecycView(List<Notifications> notif, final String userID, final String receivedNotifFrom, String notifType);;
+        void putNotifDataToRecycView(List<Notifications> notif);
     }
 }
