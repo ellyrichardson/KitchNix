@@ -449,7 +449,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
     private void acceptedFriendRequestNotification(final String receiverID, final String senderID, final String receiverUsername) {
         String currentDateandTime = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss", Locale.ENGLISH).format(new Date());
         DatabaseReference sentRequestNotifRef = rootRef.child(senderID + "/notifications/acceptedFriendReqNotif");
-        sentRequestNotifRef.child(receiverID).child("id").setValue(receiverUsername);
+        sentRequestNotifRef.child(receiverID).child("username").setValue(receiverUsername);
         sentRequestNotifRef.child(receiverID).child("status").setValue("unopened");
         sentRequestNotifRef.child(receiverID).child("date").setValue(currentDateandTime);
         sentRequestNotifRef.child(receiverID).child("type").setValue(0);
