@@ -8,45 +8,44 @@ public class Notifications {
     String username;
     String postName;
     String userPicture;
+    String status;
     Date dateTime;
 
 
-    public Notifications(String type, String username, Date dateTime) {
-        //this.id = id;
+    public Notifications(String type, String status, String username, Date dateTime) {
         this.type = type;
+        this.status = status;
         this.username = username;
         this.dateTime = dateTime;
     }
 
-    public Notifications(String type, String username, String postName, Date dateTime) {
-        //this.id = id;
+    public Notifications(String type, String status, String username, String postName, Date dateTime) {
         this.type = type;
+        this.status = status;
         this.username = username;
         this.postName = postName;
         this.dateTime = dateTime;
     }
 
-    /*public int getNotificationId() {
-        //return this.id;
-    }*/
-
-    public String getNotificationType() {
+    public String getNotifType() {
         return this.type;
     }
     
-    public String getNotficationUsername() {
+    public String getNotifUsername() {
         return this.username;
     }
 
-    public String getNotificationUserPic() {
+    public String getNotifUserPic() {
         return this.userPicture;
     }
 
-    public String getNotificationPostName() {
+    public String getNotifPostName() {
         return this.postName;
     }
 
-    public Date getDateTime() {
+    public String getNotifStatus() {return this.status;}
+
+    public Date getNotifDateTime() {
         return this.dateTime;
     }
 }

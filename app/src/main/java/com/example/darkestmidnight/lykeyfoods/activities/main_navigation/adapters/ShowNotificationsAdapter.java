@@ -1,5 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters;
 
+import android.graphics.Color;
+import android.icu.text.SimpleDateFormat;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,18 +11,24 @@ import android.widget.TextView;
 import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
 
+import org.w3c.dom.Text;
+
+import java.text.DateFormat;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 
 public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotificationsAdapter.CustomViewHolder>{
     private List<Notifications> notifications;
 
     public class CustomViewHolder extends RecyclerView.ViewHolder {
-        public TextView notifUsername, notifDescr;
+        public TextView notifTitle, notifStatus, notifDate;
 
         public CustomViewHolder(View view) {
             super(view);
-            notifUsername = (TextView) view.findViewById(R.id.notifUsernameTxV);
-            notifDescr = (TextView) view.findViewById(R.id.notifDescrTxV);
+            notifTitle = (TextView) view.findViewById(R.id.notifTitleTxV);
+            notifStatus = (TextView) view.findViewById(R.id.notifStatusTxV);
+            notifDate = (TextView) view.findViewById(R.id.notifDateTxV);
         }
     }
 
@@ -39,8 +47,21 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
     @Override
     public void onBindViewHolder(ShowNotificationsAdapter.CustomViewHolder holder, int position) {
         Notifications notification = notifications.get(position);
-        holder.notifUsername.setText(notification.getNotficationUsername());
-        holder.notifDescr.setText(notification.getNotificationType());
+        if (!notification.getNotifStatus().equals("opened")) {
+            holder.itemView.setBackgroundColor(Color.parseColor("#A6C246"));
+        }
+        else {
+            holder.itemView.setBackgroundColor(Color.parseColor("#F7EFE2"));
+        }
+
+        Date dateFormat = notification.getNotifDateTime();
+        SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
+
+        if (notification.getNotifType().equals("0")) {
+            holder.notifTitle.setText(notification.getNotifUsername() + "sent you a friend request!");
+            holder.notifStatus.setText(notification.getNotifStatus());
+            holder.notifDate.setText(dateFormatter.format(dateFormat));
+        }
     }
 
     @Override

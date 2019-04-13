@@ -440,6 +440,7 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         sentRequestNotifRef.child(senderID).child("username").setValue(senderUsername);
         sentRequestNotifRef.child(senderID).child("status").setValue("unopened");
         sentRequestNotifRef.child(senderID).child("date").setValue(currentDateandTime);
+        sentRequestNotifRef.child(senderID).child("type").setValue("0");
     }
 
     /**
@@ -452,6 +453,6 @@ public class UserFragment extends Fragment implements UserInteraction.FriendRequ
         sentRequestNotifRef.child(receiverID).child("username").setValue(receiverUsername);
         sentRequestNotifRef.child(receiverID).child("status").setValue("unopened");
         sentRequestNotifRef.child(receiverID).child("date").setValue(currentDateandTime);
-        sentRequestNotifRef.child(receiverID).child("type").setValue(0);
+        sentRequestNotifRef.child(receiverID).child("type").setValue("1");
     }
 }

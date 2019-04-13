@@ -2,6 +2,7 @@ package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.bottom
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.icu.text.SimpleDateFormat;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
@@ -166,50 +167,6 @@ public class NotificationsFragment extends Fragment {
                 notificationsAdapter.notifyDataSetChanged();
             }
         }, userID, receivedFriendReq);
-        /*retrieveSentFriendReqNotif(new ProcessNotifData() {
-            @Override
-            public void putNotifDataToRecycView(List<Notifications> notif) {
-                RecyclerView notificationsRecycVw;
-                ShowNotificationsAdapter notificationsAdapter;
-
-                notificationsAdapter = new ShowNotificationsAdapter(notif);
-                RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
-                notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
-                notificationsRecycVw.setLayoutManager(nLayoutManager);
-                notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
-                notificationsRecycVw.setAdapter(notificationsAdapter);
-                notificationsAdapter.notifyDataSetChanged();
-            }
-        }, userID);*/
-
-
-        /*final List<String> receivedFriendReq = new ArrayList<>();
-        retrieveReceivedFriendReqIds(new RetrivUserRecivFriendReq() {
-            @Override
-            public void setRetrievedRecivReqIds(List<String> array) {
-                //TODO: set the empty List string above with this!
-                receivedFriendReq.addAll(array);
-            }
-        }, userID);*/
-
-        /*if (!receivedFriendReq.isEmpty()) {
-            //TODO: do the main notification retrieval here? FIX THIS!
-            retrieveSentFriendReqNotif(new ProcessNotifData() {
-                @Override
-                public void putNotifDataToRecycView(List<Notifications> notif) {
-                    RecyclerView notificationsRecycVw;
-                    ShowNotificationsAdapter notificationsAdapter;
-
-                    notificationsAdapter = new ShowNotificationsAdapter(notif);
-                    RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
-                    notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
-                    notificationsRecycVw.setLayoutManager(nLayoutManager);
-                    notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
-                    notificationsRecycVw.setAdapter(notificationsAdapter);
-                    notificationsAdapter.notifyDataSetChanged();
-                }
-            }, userID, receivedFriendReq);
-        }*/
     }
 
     /**
@@ -229,25 +186,21 @@ public class NotificationsFragment extends Fragment {
                 int dsIterator = 0;
                 List<Notifications> acceptReqNotifList = new ArrayList<>();
                 List<Notifications> friendReqNotifList = new ArrayList<>();
-                //Notifications sentReqNotifReqIds = new Notifications();
+
+                // date format for the date of the Notification from the Firebase
+                SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
 
                 for (int i = 0; i < recivFriendReqIds.size(); i++) {
                     if (dataSnapshot.hasChild("notifications/sentFriendReqNotif/" + recivFriendReqIds.get(i))) {
-                        for (DataSnapshot ds : dataSnapshot.child("notifications/sentFriendReqNotif/" + recivFriendReqIds.get(i)).getChildren()) {
-                            friendReqNotifList.add(new Notifications(ds.child("status").getValue(String.class),
+                        DataSnapshot ds = dataSnapshot.child("notifications/sentFriendReqNotif/" + recivFriendReqIds.get(i));
+                        try {
+                            // the string of date from the Firebase will be parsed to a Date object before inputting.
+                            friendReqNotifList.add(new Notifications(ds.child("type").getValue(String.class),ds.child("status").getValue(String.class),
                                     ds.child("username").getValue(String.class),
-                                    ds.child("date").getValue(Date.class)));
-                        /*
-                        * friendReqNotifList.add(new Notifications(ds.child(String.valueOf(dsIterator)).child("type").getValue(String.class),
-                                ds.child(String.valueOf(dsIterator)).child("username").getValue(String.class),
-                                ds.child(String.valueOf(dsIterator)).child("date").getValue(Date.class)));
-                                */
-                   /*if (ds.hasChild(String.valueOf(dsIterator)+"/username")) {
-                        friendReqNotifList.add(new Notifications(ds.child(String.valueOf(dsIterator)).child("type").getValue(String.class),
-                                ds.child(String.valueOf(dsIterator)).child("username").getValue(String.class),
-                                ds.child(String.valueOf(dsIterator)).child("date").getValue(Date.class)));
-                    }*/
-                            //dsIterator++;
+                                    dateFormatter.parse(ds.child("date").getValue(String.class))));
+                        } catch (java.text.ParseException e) {
+                            // this catch is needed for parsing the date format
+                            e.printStackTrace();
                         }
                     }
                 }

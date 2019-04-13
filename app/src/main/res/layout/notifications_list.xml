@@ -2,34 +2,38 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:focusable="true"
-    android:clickable="true"
+    android:layout_height="100dp"
     android:background="?android:attr/selectableItemBackground"
+    android:clickable="true"
+    android:focusable="true"
     android:paddingBottom="13dp">
     >
 
     <TextView
-        android:id="@+id/notifUsernameTxV"
+        android:id="@+id/notifDateTxV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentTop="true"
-        android:layout_marginLeft="17dp"
-        android:layout_marginStart="17dp"
-        android:layout_marginTop="13dp"
-        android:text="Post Title"
+        android:layout_alignStart="@+id/notifTitleTxV"
+        android:layout_below="@+id/notifStatusTxV"
+        android:text="Notification Date" />
+
+    <TextView
+        android:id="@+id/notifTitleTxV"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/notifStatusTxV"
+        android:layout_alignStart="@+id/notifStatusTxV"
+        android:text="Notification Title"
         android:textColor="@color/colorPrimaryDark"
         android:textSize="18dp" />
 
     <TextView
-        android:id="@+id/notifDescrTxV"
+        android:id="@+id/notifStatusTxV"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_alignLeft="@+id/userFullName"
-        android:layout_alignStart="@+id/userFullName"
-        android:layout_below="@+id/userFullName"
-        android:text="Post Content" />
+        android:layout_alignParentStart="true"
+        android:layout_centerVertical="true"
+        android:layout_marginStart="25dp"
+        android:text="Notification Status" />
 
 </RelativeLayout>
