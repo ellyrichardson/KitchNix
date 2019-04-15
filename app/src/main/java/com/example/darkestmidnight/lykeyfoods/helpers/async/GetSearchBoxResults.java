@@ -34,7 +34,6 @@ public class GetSearchBoxResults extends AsyncTask<String, String, String> {
     // Add a pre-execute thing
 
     SharedPreferences ShPreference;
-    SharedPreferences.Editor PrefEditor;
     static String MyPREFERENCES = "API Authentication";
     String accessToken = "Access Token";
 
@@ -75,20 +74,6 @@ public class GetSearchBoxResults extends AsyncTask<String, String, String> {
 
             // Tells the URL that I want to read the response data
             httpURLConnection.setDoInput(true);
-
-            // JSON object for the REST API
-            /*JSONObject jsonParam = new JSONObject();
-            jsonParam.put("username", params[1]);
-
-            Log.i("JSON", jsonParam.toString());
-
-            // To write primitive Java data types to an output stream in a portable way
-            DataOutputStream wr = new DataOutputStream(httpURLConnection.getOutputStream());
-            // Writes out a byte to the underlying output stream of the data posted from .execute function
-            wr.writeBytes(jsonParam.toString());
-            // Flushes the jsonParam to the output stream
-            wr.flush();
-            wr.close();*/
 
             // // Representing the input stream to URL response
             InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());

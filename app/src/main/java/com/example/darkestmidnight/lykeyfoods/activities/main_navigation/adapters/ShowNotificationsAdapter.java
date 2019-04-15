@@ -1,7 +1,9 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters;
 
+import android.content.Context;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
+import android.os.Bundle;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,7 +11,9 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 
 import com.example.darkestmidnight.lykeyfoods.R;
+import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.MainNavigation;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
+import com.example.darkestmidnight.lykeyfoods.models.User;
 
 import org.w3c.dom.Text;
 
@@ -20,8 +24,11 @@ import java.util.List;
 
 public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotificationsAdapter.CustomViewHolder>{
     private List<Notifications> notifications;
+    private List<User> users;
 
-    public class CustomViewHolder extends RecyclerView.ViewHolder {
+    Context context;
+
+    public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView notifTitle, notifStatus, notifDate;
 
         public CustomViewHolder(View view) {
@@ -29,11 +36,81 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
             notifTitle = (TextView) view.findViewById(R.id.notifTitleTxV);
             notifStatus = (TextView) view.findViewById(R.id.notifStatusTxV);
             notifDate = (TextView) view.findViewById(R.id.notifDateTxV);
+            notifTitle.setOnClickListener(new View.OnClickListener() {
+                @Override
+                public void onClick(View v) {
+
+                    // pass MainNavigation instance to the adapter
+                    if (context instanceof MainNavigation) {
+
+                        Bundle args = new Bundle();
+
+                        String tempArray[] = notifTitle.getText().toString().split(" ");
+                        // Only puts the username of the notification sender
+                        String nUsername = tempArray[0];
+                        String tmpFullName = "";
+                        String tmpUserID = "";
+                        String tmpUsername = "";
+
+                        // gets other info of matching user based on username
+                        for (int i = 0; i < users.size(); i++) {
+                            if (users.get(i).getUsername().equals(nUsername)) {
+                                tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
+                                tmpUserID = users.get(i).getUserId() + "";
+                                tmpUsername = users.get(i).getUsername();
+                            }
+                        }
+                        // to pass result values to userFragment
+                        args.putString("sRFullName", tmpFullName);
+                        args.putString("sRUserID", tmpUserID);
+                        args.putString("sRUsername", tmpUsername);
+                        ((MainNavigation) context).userFragment(args);
+                    }
+
+
+                }
+            });
+        }
+
+        /**
+         * This OnClick is not executing for some reason.
+         * TODO: Fix this!
+         **/
+        @Override
+        public void onClick(View v) {
+
+            if (context instanceof MainNavigation) {
+
+                Bundle args = new Bundle();
+
+                String tempArray[] = notifTitle.getText().toString().split(" ");
+                // Only puts the username of the notification sender
+                String nUsername = tempArray[0];
+                String tmpFullName = "";
+                String tmpUserID = "";
+                String tmpUsername = "";
+
+                // gets other info of matching user based on username
+                for (int i = 0; i < getItemCount(); i++) {
+                    if (users.get(i).getUsername().equals(nUsername)) {
+                        tmpFullName = users.get(i).getFirstName() + " " + users.get(i).getLastName();
+                        tmpUserID = users.get(i).getUserId() + "";
+                        tmpUsername = users.get(i).getUsername();
+                    }
+                }
+                // to pass result values to userFragment
+                args.putString("sRFullName", tmpFullName);
+                args.putString("sRUserID", tmpUserID);
+                args.putString("sRUsername", tmpUsername);
+                ((MainNavigation) context).userFragment(args);
+            }
         }
     }
 
-    public ShowNotificationsAdapter(List<Notifications> notifications){
+    public ShowNotificationsAdapter(Context context, List<Notifications> notifications, List<User> users){
+        this.context = context;
         this.notifications = notifications;
+        this.users = users;
     }
 
     @Override
@@ -58,7 +135,7 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
 
         if (notification.getNotifType().equals("0")) {
-            holder.notifTitle.setText(notification.getNotifUsername() + "sent you a friend request!");
+            holder.notifTitle.setText(notification.getNotifUsername() + " sent you a friend request!");
             holder.notifStatus.setText(notification.getNotifStatus());
             holder.notifDate.setText(dateFormatter.format(dateFormat));
         }
