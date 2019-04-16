@@ -167,10 +167,8 @@ public class NotificationsFragment extends Fragment {
 
         retrieveSentFriendReqNotif(new ProcessNotifData() {
             @Override
-            public void putNotifDataToRecycView(List<Notifications> notif) {
-                List<User> users = new ArrayList<>();
-
-                for (int j = 0; j < notif.size(); j++) {
+            public void putNotifDataToRecycView(List<Notifications> notif, List<User> users) { ;
+                /*for (int j = 0; j < notif.size(); j++) {
 
                     try {
                         JSONArray pJObjArray = new JSONArray(getUserInfoOfNotif(notif.get(j).getNotifUsername()));
@@ -190,7 +188,7 @@ public class NotificationsFragment extends Fragment {
                         Log.d("Json","Exception = "+e.toString());
                     }
 
-                }
+                }*/
 
                 RecyclerView notificationsRecycVw;
                 ShowNotificationsAdapter notificationsAdapter;
@@ -208,7 +206,7 @@ public class NotificationsFragment extends Fragment {
             public String getUserInfoOfNotif(String username) {
 
 
-                Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
+                /*Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
                 StringBuilder result = new StringBuilder();
 
@@ -248,7 +246,8 @@ public class NotificationsFragment extends Fragment {
                 }
 
                 Log.e("TAG", result.toString());
-                return result.toString();
+                return result.toString();*/
+                return "";
             }
 
         }, userID, receivedFriendReq);
@@ -290,7 +289,69 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
-                notifData.putNotifDataToRecycView(friendReqNotifList);
+                StringBuilder result = new StringBuilder();
+                List<User> users = new ArrayList<>();
+
+                // gets the AccessToken
+                ShPreference = getContext().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
+                String APIAuthentication = "Bearer " + ShPreference.getString(accessToken, "");
+
+                for (int i = 0; i < friendReqNotifList.size(); i++) {
+                    HttpURLConnection httpURLConnection = null;
+                    try {
+
+                        // Sets up connection to the URL (params[2] from .execute in "login")
+                        httpURLConnection = (HttpURLConnection) new URL("http://192.168.1.4:8000/api/search/?search=" + friendReqNotifList.get(i).getNotifUsername()).openConnection();
+                        // Sets the request method for the URL
+                        httpURLConnection.setRequestMethod("GET");
+                        httpURLConnection.setRequestProperty ("Authorization", APIAuthentication);
+
+                        // Tells the URL that I want to read the response data
+                        httpURLConnection.setDoInput(true);
+
+                        // // Representing the input stream to URL response
+                        InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
+
+                        Log.e("TAG", "Length" + in);
+                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
+
+                        // reading the input stream / response from the url
+                        String line;
+                        while ((line = reader.readLine()) != null) {
+                            result.append(line);
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    } finally {
+                        // Disconnects socket after using
+                        if (httpURLConnection != null) {
+                            httpURLConnection.disconnect();
+                        }
+                    }
+
+                    Log.e("TAG", result.toString());
+                    //result.toString();
+
+                    try {
+                        JSONArray pJObjArray = new JSONArray(result.toString());
+
+                        Log.e("TAG", "Length" + pJObjArray.length());
+
+                        for (int j = 0; i < pJObjArray.length(); i++) {
+                            // puts the current iterated JSON object from the array to another temporary object
+                            JSONObject pJObj_data = pJObjArray.getJSONObject(j);
+
+                            // inputs necesarry elements for the User
+                            users.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
+                        }
+
+                    } catch (JSONException e) {
+                        //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                        Log.d("Json","Exception = "+e.toString());
+                    }
+                }
+
+                notifData.putNotifDataToRecycView(friendReqNotifList, users);
             }
 
             @Override
@@ -325,7 +386,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private interface ProcessNotifData {
-        void putNotifDataToRecycView(List<Notifications> notif);
+        void putNotifDataToRecycView(List<Notifications> notif, List<User> users);
         String getUserInfoOfNotif(String username);
         //void initializeUserObjOfNotif(String result);
 

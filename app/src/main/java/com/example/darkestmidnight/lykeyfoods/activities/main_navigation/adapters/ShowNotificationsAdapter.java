@@ -14,6 +14,8 @@ import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.MainNavigation;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
 import com.example.darkestmidnight.lykeyfoods.models.User;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import org.w3c.dom.Text;
 
@@ -27,6 +29,10 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
     private List<User> users;
 
     Context context;
+
+    // to update status of the user's notification holder
+    final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
+    DatabaseReference rootRef = firebase.getReference("users");
 
     public class CustomViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
         public TextView notifTitle, notifStatus, notifDate;
@@ -126,6 +132,15 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
         Notifications notification = notifications.get(position);
         if (!notification.getNotifStatus().equals("opened")) {
             holder.itemView.setBackgroundColor(Color.parseColor("#A6C246"));
+            //TODO: must somehow need the current user ID in the "<SignedInID>"
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
+                    //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
+                    DatabaseReference senderSentFriendReqRef = rootRef.child("<SignedInID>" + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
+                    //sentFriendReqRef.push().setValue(uVisited);
+                    senderSentFriendReqRef.child("status").setValue("opened");
+                }
+            }
         }
         else {
             holder.itemView.setBackgroundColor(Color.parseColor("#F7EFE2"));
@@ -139,6 +154,19 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
             holder.notifStatus.setText(notification.getNotifStatus());
             holder.notifDate.setText(dateFormatter.format(dateFormat));
         }
+
+        //Notifications working but not as intended. BufferedReader not getting executed in the Firebase function inside NotificationsFragment. Added some updates on ShowNotificationsAdapter ready to use
+
+        /*if (notification.getNotifStatus().equals("unopened")) {
+            for (int i = 0; i < users.size(); i++) {
+                if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
+                    //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
+                    DatabaseReference senderSentFriendReqRef = rootRef.child("<SignedInID>" + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
+                    //sentFriendReqRef.push().setValue(uVisited);
+                    senderSentFriendReqRef.child("status").setValue("opened");
+                }
+            }
+        }*/
     }
 
     @Override
