@@ -1,6 +1,7 @@
 package com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters;
 
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.graphics.Color;
 import android.icu.text.SimpleDateFormat;
 import android.os.Bundle;
@@ -27,8 +28,19 @@ import java.util.List;
 public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotificationsAdapter.CustomViewHolder>{
     private List<Notifications> notifications;
     private List<User> users;
+    private String currentUserID;
 
     Context context;
+
+    /*SharedPreferences ShPreference;
+    String currentUserID = "Current User ID";
+    //SharedPreferences.Editor PrefEditor;
+    String accessToken = "Access Token";*/
+
+    //ShPreference = getSharedPreferences(currentUserID, Context.MODE_PRIVATE);
+
+    // converts the userSignedIn id to string
+    //final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
 
     // to update status of the user's notification holder
     final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
@@ -113,10 +125,11 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
         }
     }
 
-    public ShowNotificationsAdapter(Context context, List<Notifications> notifications, List<User> users){
+    public ShowNotificationsAdapter(Context context, List<Notifications> notifications, List<User> users, final String currentUserID){
         this.context = context;
         this.notifications = notifications;
         this.users = users;
+        this.currentUserID = currentUserID;
     }
 
     @Override
@@ -136,7 +149,7 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
             for (int i = 0; i < users.size(); i++) {
                 if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
                     //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
-                    DatabaseReference senderSentFriendReqRef = rootRef.child("<SignedInID>" + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
+                    DatabaseReference senderSentFriendReqRef = rootRef.child(currentUserID + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
                     //sentFriendReqRef.push().setValue(uVisited);
                     senderSentFriendReqRef.child("status").setValue("opened");
                 }

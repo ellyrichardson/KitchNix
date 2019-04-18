@@ -193,7 +193,7 @@ public class NotificationsFragment extends Fragment {
                 RecyclerView notificationsRecycVw;
                 ShowNotificationsAdapter notificationsAdapter;
 
-                notificationsAdapter = new ShowNotificationsAdapter(getContext(), notif, users);
+                notificationsAdapter = new ShowNotificationsAdapter(getContext(), notif, users, userID);
                 RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
                 notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
                 notificationsRecycVw.setLayoutManager(nLayoutManager);
@@ -305,6 +305,7 @@ public class NotificationsFragment extends Fragment {
                         // Sets the request method for the URL
                         httpURLConnection.setRequestMethod("GET");
                         httpURLConnection.setRequestProperty ("Authorization", APIAuthentication);
+                        httpURLConnection.setRequestProperty("Accept","application/json");
 
                         // Tells the URL that I want to read the response data
                         httpURLConnection.setDoInput(true);
