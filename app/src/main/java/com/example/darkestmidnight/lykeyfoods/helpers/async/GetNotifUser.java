@@ -12,6 +12,7 @@ import android.util.Log;
 import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.HomePostsAdapter;
 import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.SearchResultsAdapter;
+import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.ShowNotificationsAdapter;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
 import com.example.darkestmidnight.lykeyfoods.models.Post;
 import com.example.darkestmidnight.lykeyfoods.models.User;
@@ -31,27 +32,31 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
-/*public class GetNotifUser extends AsyncTask<String, String, String> {
+public class GetNotifUser extends AsyncTask<String, String, String> {
     // Add a pre-execute thing
 
     private SharedPreferences ShPreference;
     static private String MyPREFERENCES = "API Authentication";
     private String accessToken = "Access Token";
+    private String currentUserID = "Current User ID";
 
-    List<User> users;
+    List<Notifications> notifications;
 
-    private RecyclerView notifUserRecyclerView;
-    private SearchResultsAdapter uAdapter;
+    //private RecyclerView notifUserRecyclerView;
+    //private ShowNotificationsAdapter nAdapter;
+
+    private RecyclerView notificationsRecycVw;
+    private ShowNotificationsAdapter notificationsAdapter;
 
     private WeakReference<Context> mNotifUserReference;
     Activity activity;
     //private WeakReference<GetHomePostsCallback> callbackWeakReference;
 
     // constructor
-    public GetNotifUser(Context context, Activity activity, List<User> users){
+    public GetNotifUser(Context context, Activity activity, List<Notifications> friendReqNotifList){
         mNotifUserReference = new WeakReference<>(context);
         this.activity = activity;
-        this.users = users;
+        this.notifications = friendReqNotifList;
         //callbackWeakReference = new WeakReference<>(callback);
     }
 
@@ -60,7 +65,7 @@ import java.util.List;
         Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
 
         StringBuilder result = new StringBuilder();
-        List<Notifications> users = new ArrayList<>();
+        List<User> users = new ArrayList<>();
 
         Context context = mNotifUserReference.get();
 
@@ -68,16 +73,16 @@ import java.util.List;
         ShPreference = context.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
         String APIAuthentication = "Bearer " + ShPreference.getString(accessToken, "");
 
-        for (int i = 0; i < users.size(); i++) {
+        for (int i = 0; i < notifications.size(); i++) {
             HttpURLConnection httpURLConnection = null;
             try {
 
                 // Sets up connection to the URL (params[2] from .execute in "login")
-                httpURLConnection = (HttpURLConnection) new URL("http://192.168.1.4:8000/api/search/?search=" + users.get(i).getNotifUsername()).openConnection();
+                httpURLConnection = (HttpURLConnection) new URL(params[0] + notifications.get(i).getNotifUsername()).openConnection();
                 // Sets the request method for the URL
                 httpURLConnection.setRequestMethod("GET");
-                httpURLConnection.setRequestProperty ("Authorization", APIAuthentication);
-                httpURLConnection.setRequestProperty("Accept","application/json");
+                httpURLConnection.setRequestProperty("Authorization", APIAuthentication);
+                httpURLConnection.setRequestProperty("Accept", "application/json");
 
                 // Tells the URL that I want to read the response data
                 httpURLConnection.setDoInput(true);
@@ -102,8 +107,9 @@ import java.util.List;
                 }
             }
 
-            Log.e("TAG", result.toString());
-            result.toString();
+        }
+        Log.e("TAG", result.toString());
+        return result.toString();
     }
 
     @Override
@@ -112,27 +118,59 @@ import java.util.List;
         // expecting a response code fro my server upon receiving the POST data
         Log.e("TAG", result);
 
-        //Context context = mNotifUserReference.get();
+        Context context = mNotifUserReference.get();
 
         // will get the JSON files based from the Post model
-        List<User> usersToShow = new ArrayList<>();
+        List<User> usersOfNotif = new ArrayList<>();
+
+        final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
+
+        if (context != null) {
+            notificationsAdapter = new ShowNotificationsAdapter(context, notifications, usersOfNotif, strSignedInUID);
+            RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(context);
+            notificationsRecycVw = (RecyclerView) activity.findViewById(R.id.notifRcyclrView);
+            notificationsRecycVw.setLayoutManager(nLayoutManager);
+            notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
+            notificationsRecycVw.setAdapter(notificationsAdapter);
+            notificationsAdapter.notifyDataSetChanged();
+
+            for (int i = 0; i < notifications.size(); i++) {
+                try {
+                    JSONArray pJObjArray = new JSONArray(result);
+
+                    Log.e("TAG", "Length" + pJObjArray.length());
+
+                    for (int j = 0; j < pJObjArray.length(); j++) {
+                        // puts the current iterated JSON object from the array to another temporary object
+                        JSONObject pJObj_data = pJObjArray.getJSONObject(j);
+
+                        // inputs necesarry elements for the User
+                        usersOfNotif.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
+                    }
+
+                } catch (JSONException e) {
+                    //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
+                    Log.d("Json","Exception = "+e.toString());
+                }
+            }
+            notificationsAdapter.notifyDataSetChanged();
+        }
 
         // For posts
-        try {
+        /*try {
             JSONArray pJObjArray = new JSONArray(result);
 
             Log.e("TAG", "Length" + pJObjArray.length());
 
             if (context != null) {
                 // sets the adapter to output users with view holder
-                uAdapter = new SearchResultsAdapter(context, usersToShow);
-                // sets the recycler view to use for the users view holders to be put
-                RecyclerView.LayoutManager pLayoutManager = new LinearLayoutManager(context.getApplicationContext());
-                notifUserRecyclerView = (RecyclerView) activity.findViewById(R.id.searchBoxRcyclerV);
-                notifUserRecyclerView.setLayoutManager(pLayoutManager);
-                notifUserRecyclerView.setItemAnimator(new DefaultItemAnimator());
-                // uses the adapter
-                notifUserRecyclerView.setAdapter(uAdapter);
+                notificationsAdapter = new ShowNotificationsAdapter(context, usersOfNotif, strSignedInUID);
+                RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(context);
+                notificationsRecycVw = (RecyclerView) activity.findViewById(R.id.notifRcyclrView);
+                notificationsRecycVw.setLayoutManager(nLayoutManager);
+                notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
+                notificationsRecycVw.setAdapter(notificationsAdapter);
+                notificationsAdapter.notifyDataSetChanged();
 
                 // algorithm for parsing the JSONArray from the Django REST API
                 for (int i = 0; i < pJObjArray.length(); i++) {
@@ -140,16 +178,16 @@ import java.util.List;
                     JSONObject pJObj_data = pJObjArray.getJSONObject(i);
 
                     // inputs necesarry elements for the User
-                    usersToShow.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
+                    usersOfNotif.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
                 }
 
                 // notifies the adapter when dataset is updated to not reference original dataset post
-                uAdapter.notifyDataSetChanged();
+                notificationsAdapter.notifyDataSetChanged();
             }
 
         } catch (JSONException e) {
             //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
             Log.d("Json","Exception = "+e.toString());
-        }
+        }*/
     }
-}}*/
+}

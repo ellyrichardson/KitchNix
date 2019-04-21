@@ -145,15 +145,23 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
         Notifications notification = notifications.get(position);
         if (!notification.getNotifStatus().equals("opened")) {
             holder.itemView.setBackgroundColor(Color.parseColor("#A6C246"));
+
+            if (users.get(position).getUsername().equals(notification.getNotifUsername())) {
+                //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
+                DatabaseReference senderSentFriendReqRef = rootRef.child(currentUserID + "/notifications/sentFriendReqNotif/" + users.get(position).getUserId());
+                //sentFriendReqRef.push().setValue(uVisited);
+                senderSentFriendReqRef.child("status").setValue("opened");
+            }
+
             //TODO: must somehow need the current user ID in the "<SignedInID>"
-            for (int i = 0; i < users.size(); i++) {
+            /*for (int i = 0; i < users.size(); i++) {
                 if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
                     //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
                     DatabaseReference senderSentFriendReqRef = rootRef.child(currentUserID + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
                     //sentFriendReqRef.push().setValue(uVisited);
                     senderSentFriendReqRef.child("status").setValue("opened");
                 }
-            }
+            }*/
         }
         else {
             holder.itemView.setBackgroundColor(Color.parseColor("#F7EFE2"));

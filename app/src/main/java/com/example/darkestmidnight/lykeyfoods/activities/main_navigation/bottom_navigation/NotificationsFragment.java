@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 
 import com.example.darkestmidnight.lykeyfoods.R;
 import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.ShowNotificationsAdapter;
+import com.example.darkestmidnight.lykeyfoods.helpers.async.GetNotifUser;
 import com.example.darkestmidnight.lykeyfoods.interfaces.RetrivUserRecivFriendReq;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
 import com.example.darkestmidnight.lykeyfoods.models.User;
@@ -63,6 +64,8 @@ public class NotificationsFragment extends Fragment {
 
     final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
     DatabaseReference rootRef = firebase.getReference("users");
+
+    GetNotifUser getNotifUser;
 
     SharedPreferences ShPreference;
     static String MyPREFERENCES = "API Authentication";   //// TODO:: Change the name of preferences everywhere
@@ -167,86 +170,14 @@ public class NotificationsFragment extends Fragment {
 
         retrieveSentFriendReqNotif(new ProcessNotifData() {
             @Override
-            public void putNotifDataToRecycView(List<Notifications> notif, List<User> users) { ;
-                /*for (int j = 0; j < notif.size(); j++) {
-
-                    try {
-                        JSONArray pJObjArray = new JSONArray(getUserInfoOfNotif(notif.get(j).getNotifUsername()));
-
-                        Log.e("TAG", "Length" + pJObjArray.length());
-
-                        for (int i = 0; i < pJObjArray.length(); i++) {
-                            // puts the current iterated JSON object from the array to another temporary object
-                            JSONObject pJObj_data = pJObjArray.getJSONObject(i);
-
-                            // inputs necesarry elements for the User
-                            users.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
-                        }
-
-                    } catch (JSONException e) {
-                        //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                        Log.d("Json","Exception = "+e.toString());
-                    }
-
-                }*/
-
-                RecyclerView notificationsRecycVw;
-                ShowNotificationsAdapter notificationsAdapter;
-
-                notificationsAdapter = new ShowNotificationsAdapter(getContext(), notif, users, userID);
-                RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(getContext());
-                notificationsRecycVw = (RecyclerView) getActivity().findViewById(R.id.notifRcyclrView);
-                notificationsRecycVw.setLayoutManager(nLayoutManager);
-                notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
-                notificationsRecycVw.setAdapter(notificationsAdapter);
-                notificationsAdapter.notifyDataSetChanged();
+            public void putNotifDataToRecycView(List<Notifications> notif, final String userID) {
+                getNotifUser = new GetNotifUser(getContext(), getActivity(), notif);
+                getNotifUser.execute("http://192.168.1.4:8000/api/search/?search=", userID);
             }
 
             @Override
             public String getUserInfoOfNotif(String username) {
 
-
-                /*Thread.currentThread().setPriority(Thread.MAX_PRIORITY);
-
-                StringBuilder result = new StringBuilder();
-
-                // gets the AccessToken
-                ShPreference = context.getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                String APIAuthentication = "Bearer " + ShPreference.getString(accessToken, "");
-
-                HttpURLConnection httpURLConnection = null;
-                try {
-
-                    // Sets up connection to the URL (params[2] from .execute in "login")
-                    httpURLConnection = (HttpURLConnection) new URL("http://192.168.1.4:8000/api/search/?search=" + username).openConnection();
-                    // Sets the request method for the URL
-                    httpURLConnection.setRequestMethod("GET");
-                    httpURLConnection.setRequestProperty ("Authorization", APIAuthentication);
-
-                    // Tells the URL that I want to read the response data
-                    httpURLConnection.setDoInput(true);
-
-                    // // Representing the input stream to URL response
-                    InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
-
-                    BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-                    // reading the input stream / response from the url
-                    String line;
-                    while ((line = reader.readLine()) != null) {
-                        result.append(line);
-                    }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                } finally {
-                    // Disconnects socket after using
-                    if (httpURLConnection != null) {
-                        httpURLConnection.disconnect();
-                    }
-                }
-
-                Log.e("TAG", result.toString());
-                return result.toString();*/
                 return "";
             }
 
@@ -289,70 +220,7 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
-                StringBuilder result = new StringBuilder();
-                List<User> users = new ArrayList<>();
-
-                // gets the AccessToken
-                ShPreference = getContext().getSharedPreferences(MyPREFERENCES, Context.MODE_PRIVATE);
-                String APIAuthentication = "Bearer " + ShPreference.getString(accessToken, "");
-
-                for (int i = 0; i < friendReqNotifList.size(); i++) {
-                    HttpURLConnection httpURLConnection = null;
-                    try {
-
-                        // Sets up connection to the URL (params[2] from .execute in "login")
-                        httpURLConnection = (HttpURLConnection) new URL("http://192.168.1.4:8000/api/search/?search=" + friendReqNotifList.get(i).getNotifUsername()).openConnection();
-                        // Sets the request method for the URL
-                        httpURLConnection.setRequestMethod("GET");
-                        httpURLConnection.setRequestProperty ("Authorization", APIAuthentication);
-                        httpURLConnection.setRequestProperty("Accept","application/json");
-
-                        // Tells the URL that I want to read the response data
-                        httpURLConnection.setDoInput(true);
-
-                        // // Representing the input stream to URL response
-                        InputStream in = new BufferedInputStream(httpURLConnection.getInputStream());
-
-                        Log.e("TAG", "Length" + in);
-                        BufferedReader reader = new BufferedReader(new InputStreamReader(in));
-
-                        // reading the input stream / response from the url
-                        String line;
-                        while ((line = reader.readLine()) != null) {
-                            result.append(line);
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    } finally {
-                        // Disconnects socket after using
-                        if (httpURLConnection != null) {
-                            httpURLConnection.disconnect();
-                        }
-                    }
-
-                    Log.e("TAG", result.toString());
-                    //result.toString();
-
-                    try {
-                        JSONArray pJObjArray = new JSONArray(result.toString());
-
-                        Log.e("TAG", "Length" + pJObjArray.length());
-
-                        for (int j = 0; i < pJObjArray.length(); i++) {
-                            // puts the current iterated JSON object from the array to another temporary object
-                            JSONObject pJObj_data = pJObjArray.getJSONObject(j);
-
-                            // inputs necesarry elements for the User
-                            users.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
-                        }
-
-                    } catch (JSONException e) {
-                        //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-                        Log.d("Json","Exception = "+e.toString());
-                    }
-                }
-
-                notifData.putNotifDataToRecycView(friendReqNotifList, users);
+                notifData.putNotifDataToRecycView(friendReqNotifList, userID);
             }
 
             @Override
@@ -387,7 +255,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private interface ProcessNotifData {
-        void putNotifDataToRecycView(List<Notifications> notif, List<User> users);
+        void putNotifDataToRecycView(List<Notifications> notif, final String userID);
         String getUserInfoOfNotif(String username);
         //void initializeUserObjOfNotif(String result);
 
