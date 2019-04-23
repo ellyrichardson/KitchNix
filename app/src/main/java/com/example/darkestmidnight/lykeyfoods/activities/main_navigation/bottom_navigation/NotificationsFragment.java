@@ -7,38 +7,21 @@ import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.app.Fragment;
-import android.support.v7.widget.DefaultItemAnimator;
-import android.support.v7.widget.LinearLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
 import com.example.darkestmidnight.lykeyfoods.R;
-import com.example.darkestmidnight.lykeyfoods.activities.main_navigation.adapters.ShowNotificationsAdapter;
 import com.example.darkestmidnight.lykeyfoods.helpers.async.GetNotifUser;
-import com.example.darkestmidnight.lykeyfoods.interfaces.RetrivUserRecivFriendReq;
+import com.example.darkestmidnight.lykeyfoods.interfaces.RetrivInfoForNotif;
 import com.example.darkestmidnight.lykeyfoods.models.Notifications;
-import com.example.darkestmidnight.lykeyfoods.models.User;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.BufferedInputStream;
-import java.io.BufferedReader;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.net.HttpURLConnection;
-import java.net.URL;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -119,15 +102,21 @@ public class NotificationsFragment extends Fragment {
         final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
 
         final List<String> receivedFriendReq = new ArrayList<>();
-        retrieveReceivedFriendReqIds(new RetrivUserRecivFriendReq() {
+        final List<String> friendsIds = new ArrayList<>();
+        retrieveReceivedFriendReqIds(new RetrivInfoForNotif() {
             @Override
             public void setRetrievedRecivReqIds(List<String> array) {
                 //TODO: set the empty List string above with this!
                 receivedFriendReq.addAll(array);
             }
+
+            @Override
+            public void setRetrievedFriendsIds(List<String> array) {
+                friendsIds.addAll(array);
+            }
         }, strSignedInUID);
 
-        getUserNotifications(strSignedInUID, receivedFriendReq, getContext());
+        getUserNotifications(strSignedInUID, receivedFriendReq, friendsIds, getContext());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -166,7 +155,7 @@ public class NotificationsFragment extends Fragment {
         void onFragmentInteraction(Uri uri);
     }
 
-    private void getUserNotifications(final String userID, List<String>receivedFriendReq, final Context context) {
+    private void getUserNotifications(final String userID, List<String>receivedFriendReq, List<String> friendIds,final Context context) {
 
         retrieveSentFriendReqNotif(new ProcessNotifData() {
             @Override
@@ -181,7 +170,7 @@ public class NotificationsFragment extends Fragment {
                 return "";
             }
 
-        }, userID, receivedFriendReq);
+        }, userID, receivedFriendReq, friendIds);
     }
 
     /**
@@ -190,7 +179,7 @@ public class NotificationsFragment extends Fragment {
      * userID is the id of the current user signed in
      * receivedNotifFrom is the username of the user who the current user received a notification from
      **/
-    private void retrieveSentFriendReqNotif(final ProcessNotifData notifData, final String userID, final List<String> recivFriendReqIds) {
+    private void retrieveSentFriendReqNotif(final ProcessNotifData notifData, final String userID, final List<String> recivFriendReqIds, final List<String> friendsIds) {
         //TODO: clean this mess! ProcessNotifData interface, is that final? or can be changed
         //final String finalNotifType = notifType;
         final DatabaseReference retrieveNotifRef = rootRef.child(userID);
@@ -205,6 +194,7 @@ public class NotificationsFragment extends Fragment {
                 // date format for the date of the Notification from the Firebase
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
 
+                // to set the sentFriendReq notifications for the logged in user
                 for (int i = 0; i < recivFriendReqIds.size(); i++) {
                     if (dataSnapshot.hasChild("notifications/sentFriendReqNotif/" + recivFriendReqIds.get(i))) {
                         DataSnapshot ds = dataSnapshot.child("notifications/sentFriendReqNotif/" + recivFriendReqIds.get(i));
@@ -220,7 +210,21 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
+                // to set the acceptedFriendReq notif for the logged in user
+                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                    try {
+                        // the string of date from the Firebase will be parsed to a Date object before inputting.
+                        acceptReqNotifList.add(new Notifications(ds.child("type").getValue(String.class),ds.child("status").getValue(String.class),
+                                ds.child("username").getValue(String.class),
+                                dateFormatter.parse(ds.child("date").getValue(String.class))));
+                    } catch (java.text.ParseException e) {
+                        // this catch is needed for parsing the date format
+                        e.printStackTrace();
+                    }
+                }
+
                 notifData.putNotifDataToRecycView(friendReqNotifList, userID);
+                notifData.putNotifDataToRecycView(acceptReqNotifList, userID);
             }
 
             @Override
@@ -234,7 +238,7 @@ public class NotificationsFragment extends Fragment {
      * Mainly called in getUserNotifications()
      * Retrieves ids from the receivedFriendRequests of the user
      **/
-    private void retrieveReceivedFriendReqIds(final RetrivUserRecivFriendReq retrivFriendReq, final String currentUserID) {
+    private void retrieveReceivedFriendReqIds(final RetrivInfoForNotif retrivFriendReq, final String currentUserID) {
         DatabaseReference sentReceivedReqIdsRef = rootRef.child(currentUserID + "/friend_requests/receivedFriendRequests");
 
         sentReceivedReqIdsRef.addListenerForSingleValueEvent(new ValueEventListener() {
@@ -244,6 +248,7 @@ public class NotificationsFragment extends Fragment {
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     receivedFriendReqIds.add(ds.getValue(String.class));
                 }
+
                 retrivFriendReq.setRetrievedRecivReqIds(receivedFriendReqIds);
             }
 
@@ -255,7 +260,7 @@ public class NotificationsFragment extends Fragment {
     }
 
     private interface ProcessNotifData {
-        void putNotifDataToRecycView(List<Notifications> notif, final String userID);
+        void putNotifDataToRecycView(List<Notifications> notif,final String userID);
         String getUserInfoOfNotif(String username);
         //void initializeUserObjOfNotif(String result);
 

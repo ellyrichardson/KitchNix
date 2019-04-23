@@ -152,16 +152,6 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
                 //sentFriendReqRef.push().setValue(uVisited);
                 senderSentFriendReqRef.child("status").setValue("opened");
             }
-
-            //TODO: must somehow need the current user ID in the "<SignedInID>"
-            /*for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
-                    //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
-                    DatabaseReference senderSentFriendReqRef = rootRef.child(currentUserID + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
-                    //sentFriendReqRef.push().setValue(uVisited);
-                    senderSentFriendReqRef.child("status").setValue("opened");
-                }
-            }*/
         }
         else {
             holder.itemView.setBackgroundColor(Color.parseColor("#F7EFE2"));
@@ -176,18 +166,11 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
             holder.notifDate.setText(dateFormatter.format(dateFormat));
         }
 
-        //Notifications working but not as intended. BufferedReader not getting executed in the Firebase function inside NotificationsFragment. Added some updates on ShowNotificationsAdapter ready to use
-
-        /*if (notification.getNotifStatus().equals("unopened")) {
-            for (int i = 0; i < users.size(); i++) {
-                if (users.get(i).getUsername().equals(notification.getNotifUsername())) {
-                    //DatabaseReference friendReqRef = database.getReference(senderID + "/friend_requests/");
-                    DatabaseReference senderSentFriendReqRef = rootRef.child("<SignedInID>" + "/notifications/sentFriendReqNotif/" + users.get(i).getUserId());
-                    //sentFriendReqRef.push().setValue(uVisited);
-                    senderSentFriendReqRef.child("status").setValue("opened");
-                }
-            }
-        }*/
+        else if (notification.getNotifType().equals("1")) {
+            holder.notifTitle.setText(notification.getNotifUsername() + " accepted your Friend Request!");
+            holder.notifStatus.setText(notification.getNotifStatus());
+            holder.notifDate.setText(dateFormatter.format(dateFormat));
+        }
     }
 
     @Override
