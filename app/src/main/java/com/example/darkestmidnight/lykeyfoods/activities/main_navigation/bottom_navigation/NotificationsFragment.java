@@ -190,6 +190,7 @@ public class NotificationsFragment extends Fragment {
                 int dsIterator = 0;
                 List<Notifications> acceptReqNotifList = new ArrayList<>();
                 List<Notifications> friendReqNotifList = new ArrayList<>();
+                List<Notifications> allNotifList = new ArrayList<>();
 
                 // date format for the date of the Notification from the Firebase
                 SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyy-mm-dd HH:mm:ss");
@@ -210,6 +211,7 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
+                //TODO: Issue here is that the data is not getting called to the correct data structure branch. Must traverse to children more.
                 // to set the acceptedFriendReq notif for the logged in user
                 for (DataSnapshot ds: dataSnapshot.getChildren()) {
                     try {
@@ -223,8 +225,12 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
-                notifData.putNotifDataToRecycView(friendReqNotifList, userID);
-                notifData.putNotifDataToRecycView(acceptReqNotifList, userID);
+                allNotifList.addAll(friendReqNotifList);
+                allNotifList.addAll(acceptReqNotifList);
+
+
+                notifData.putNotifDataToRecycView(allNotifList, userID);
+                //notifData.putNotifDataToRecycView(acceptReqNotifList, userID);
             }
 
             @Override
