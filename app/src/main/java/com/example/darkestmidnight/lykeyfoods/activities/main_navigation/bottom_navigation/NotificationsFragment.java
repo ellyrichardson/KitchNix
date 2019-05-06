@@ -103,6 +103,7 @@ public class NotificationsFragment extends Fragment {
 
         final List<String> receivedFriendReq = new ArrayList<>();
         final List<String> friendsIds = new ArrayList<>();
+        //TODO: Issue here is that receivedFriendReq and friendsIds are still null, therefore nothing is getting sent to the getUserNotifications
         retrieveReceivedFriendReqIds(new RetrivInfoForNotif() {
             @Override
             public void setRetrievedRecivReqIds(List<String> array) {
@@ -112,9 +113,13 @@ public class NotificationsFragment extends Fragment {
 
             @Override
             public void setRetrievedFriendsIds(List<String> array) {
-                friendsIds.addAll(array);
+                //friendsIds.addAll(array);
             }
         }, strSignedInUID);
+
+        if (friendsIds != null && receivedFriendReq != null) {
+            getUserNotifications(strSignedInUID, receivedFriendReq, friendsIds, getContext());
+        }
 
         getUserNotifications(strSignedInUID, receivedFriendReq, friendsIds, getContext());
     }
@@ -211,17 +216,20 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
-                //TODO: Issue here is that the data is not getting called to the correct data structure branch. Must traverse to children more.
+                //TODO: POSSIBLY DONE!!! Issue here is that the data is not getting called to the correct data structure branch. Must traverse to children more.
                 // to set the acceptedFriendReq notif for the logged in user
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
-                    try {
-                        // the string of date from the Firebase will be parsed to a Date object before inputting.
-                        acceptReqNotifList.add(new Notifications(ds.child("type").getValue(String.class),ds.child("status").getValue(String.class),
-                                ds.child("username").getValue(String.class),
-                                dateFormatter.parse(ds.child("date").getValue(String.class))));
-                    } catch (java.text.ParseException e) {
-                        // this catch is needed for parsing the date format
-                        e.printStackTrace();
+                for (int i = 0; i < friendsIds.size(); i++) {
+                    if (dataSnapshot.hasChild("notifications/acceptedFriendReqNotif/" + friendsIds.get(i))) {
+                        DataSnapshot ds = dataSnapshot.child("notifications/acceptedFriendReqNotif/" + friendsIds.get(i));
+                        try {
+                            // the string of date from the Firebase will be parsed to a Date object before inputting.
+                            acceptReqNotifList.add(new Notifications(ds.child("type").getValue(String.class),ds.child("status").getValue(String.class),
+                                    ds.child("username").getValue(String.class),
+                                    dateFormatter.parse(ds.child("date").getValue(String.class))));
+                        } catch (java.text.ParseException e) {
+                            // this catch is needed for parsing the date format
+                            e.printStackTrace();
+                        }
                     }
                 }
 
@@ -245,17 +253,24 @@ public class NotificationsFragment extends Fragment {
      * Retrieves ids from the receivedFriendRequests of the user
      **/
     private void retrieveReceivedFriendReqIds(final RetrivInfoForNotif retrivFriendReq, final String currentUserID) {
-        DatabaseReference sentReceivedReqIdsRef = rootRef.child(currentUserID + "/friend_requests/receivedFriendRequests");
+        //DatabaseReference sentReceivedReqIdsRef = rootRef.child(currentUserID + "/friend_requests/receivedFriendRequests");
+        DatabaseReference sentReceivedReqIdsRef = rootRef;
 
         sentReceivedReqIdsRef.addListenerForSingleValueEvent(new ValueEventListener() {
             @Override
             public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
                 List<String> receivedFriendReqIds = new ArrayList<>();
-                for (DataSnapshot ds: dataSnapshot.getChildren()) {
+                List<String> friendsIds = new ArrayList<>();
+                for (DataSnapshot ds: dataSnapshot.child(currentUserID + "/friend_requests/receivedFriendRequests").getChildren()) {
                     receivedFriendReqIds.add(ds.getValue(String.class));
                 }
 
+                for (DataSnapshot ds: dataSnapshot.child(currentUserID + "/friend_requests/friends").getChildren()) {
+                    friendsIds.add(ds.getValue(String.class));
+                }
+
                 retrivFriendReq.setRetrievedRecivReqIds(receivedFriendReqIds);
+                retrivFriendReq.setRetrievedFriendsIds(friendsIds);
             }
 
             @Override
