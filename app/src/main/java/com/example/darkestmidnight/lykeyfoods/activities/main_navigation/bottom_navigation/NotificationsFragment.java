@@ -102,26 +102,17 @@ public class NotificationsFragment extends Fragment {
         final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
 
         final List<String> receivedFriendReq = new ArrayList<>();
-        final List<String> friendsIds = new ArrayList<>();
-        //TODO: Issue here is that receivedFriendReq and friendsIds are still null, therefore nothing is getting sent to the getUserNotifications
+        final List<String> friends = new ArrayList<>();
+
         retrieveReceivedFriendReqIds(new RetrivInfoForNotif() {
             @Override
-            public void setRetrievedRecivReqIds(List<String> array) {
-                //TODO: set the empty List string above with this!
-                receivedFriendReq.addAll(array);
-            }
-
-            @Override
-            public void setRetrievedFriendsIds(List<String> array) {
-                //friendsIds.addAll(array);
+            public void setRetrievedIds(List<String> receivedFriendReqIds, List<String> friendsIds) {
+                receivedFriendReq.addAll(receivedFriendReqIds);
+                friends.addAll(friendsIds);
             }
         }, strSignedInUID);
 
-        if (friendsIds != null && receivedFriendReq != null) {
-            getUserNotifications(strSignedInUID, receivedFriendReq, friendsIds, getContext());
-        }
-
-        getUserNotifications(strSignedInUID, receivedFriendReq, friendsIds, getContext());
+        getUserNotifications(strSignedInUID, receivedFriendReq, friends, getContext());
     }
 
     // TODO: Rename method, update argument and hook method into UI event
@@ -216,7 +207,6 @@ public class NotificationsFragment extends Fragment {
                     }
                 }
 
-                //TODO: POSSIBLY DONE!!! Issue here is that the data is not getting called to the correct data structure branch. Must traverse to children more.
                 // to set the acceptedFriendReq notif for the logged in user
                 for (int i = 0; i < friendsIds.size(); i++) {
                     if (dataSnapshot.hasChild("notifications/acceptedFriendReqNotif/" + friendsIds.get(i))) {
@@ -269,8 +259,8 @@ public class NotificationsFragment extends Fragment {
                     friendsIds.add(ds.getValue(String.class));
                 }
 
-                retrivFriendReq.setRetrievedRecivReqIds(receivedFriendReqIds);
-                retrivFriendReq.setRetrievedFriendsIds(friendsIds);
+                retrivFriendReq.setRetrievedIds(receivedFriendReqIds, friendsIds);
+                //retrivFriendReq.setRetrievedFriendsIds(friendsIds);
             }
 
             @Override

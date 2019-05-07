@@ -32,16 +32,6 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
 
     Context context;
 
-    /*SharedPreferences ShPreference;
-    String currentUserID = "Current User ID";
-    //SharedPreferences.Editor PrefEditor;
-    String accessToken = "Access Token";*/
-
-    //ShPreference = getSharedPreferences(currentUserID, Context.MODE_PRIVATE);
-
-    // converts the userSignedIn id to string
-    //final String strSignedInUID = ShPreference.getInt(currentUserID, 0) + "";
-
     // to update status of the user's notification holder
     final FirebaseDatabase firebase = FirebaseDatabase.getInstance();
     DatabaseReference rootRef = firebase.getReference("users");
@@ -165,7 +155,7 @@ public class ShowNotificationsAdapter extends  RecyclerView.Adapter<ShowNotifica
             holder.notifStatus.setText(notification.getNotifStatus());
             holder.notifDate.setText(dateFormatter.format(dateFormat));
         }
-
+        //TODO: It seems that getNotifType is getting recognized but has no parent?
         else if (notification.getNotifType().equals("1")) {
             holder.notifTitle.setText(notification.getNotifUsername() + " accepted your Friend Request!");
             holder.notifStatus.setText(notification.getNotifStatus());

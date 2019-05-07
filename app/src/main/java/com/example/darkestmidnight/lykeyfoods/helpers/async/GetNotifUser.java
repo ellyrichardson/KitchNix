@@ -155,39 +155,5 @@ public class GetNotifUser extends AsyncTask<String, String, String> {
             }
             notificationsAdapter.notifyDataSetChanged();
         }
-
-        // For posts
-        /*try {
-            JSONArray pJObjArray = new JSONArray(result);
-
-            Log.e("TAG", "Length" + pJObjArray.length());
-
-            if (context != null) {
-                // sets the adapter to output users with view holder
-                notificationsAdapter = new ShowNotificationsAdapter(context, usersOfNotif, strSignedInUID);
-                RecyclerView.LayoutManager nLayoutManager = new LinearLayoutManager(context);
-                notificationsRecycVw = (RecyclerView) activity.findViewById(R.id.notifRcyclrView);
-                notificationsRecycVw.setLayoutManager(nLayoutManager);
-                notificationsRecycVw.setItemAnimator(new DefaultItemAnimator());
-                notificationsRecycVw.setAdapter(notificationsAdapter);
-                notificationsAdapter.notifyDataSetChanged();
-
-                // algorithm for parsing the JSONArray from the Django REST API
-                for (int i = 0; i < pJObjArray.length(); i++) {
-                    // puts the current iterated JSON object from the array to another temporary object
-                    JSONObject pJObj_data = pJObjArray.getJSONObject(i);
-
-                    // inputs necesarry elements for the User
-                    usersOfNotif.add(new User(pJObj_data.getString("first_name"), pJObj_data.getString("last_name"), pJObj_data.getString("username"), pJObj_data.getString("email"), pJObj_data.getInt("id")));
-                }
-
-                // notifies the adapter when dataset is updated to not reference original dataset post
-                notificationsAdapter.notifyDataSetChanged();
-            }
-
-        } catch (JSONException e) {
-            //Toast.makeText(JSonActivity.this, e.toString(), Toast.LENGTH_LONG).show();
-            Log.d("Json","Exception = "+e.toString());
-        }*/
     }
 }
