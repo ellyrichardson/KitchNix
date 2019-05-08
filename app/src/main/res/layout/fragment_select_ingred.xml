@@ -1,0 +1,104 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/baseSttngsRelativeLayout"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#DCCFB6"
+    tools:context=".activities.main_navigation.bottom_navigation.SettingsFragment">
+
+    <!-- TODO: Update blank fragment layout -->
+
+    <TextView
+        android:id="@+id/amountOfOutputLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="260dp"
+        android:text="Amount of Output"
+        android:textColor="#900C3F"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/chooseIngrInstr"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="295dp"
+        android:text="(Separate ingredients with commas.)"
+        android:textColor="#"
+        android:textSize="17sp" />
+
+    <TextView
+        android:id="@+id/chooseIngrLabel"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="177dp"
+        android:text="Ingredients"
+        android:textColor="#900C3F"
+        android:textSize="25sp" />
+
+    <TextView
+        android:id="@+id/selectIngrTitle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="83dp"
+        android:text="Recipe Options"
+        android:textColor="#900C3F"
+        android:textSize="35sp" />
+
+    <EditText
+        android:id="@+id/ingredPlaceHolder"
+        android:layout_width="262dp"
+        android:layout_height="104dp"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="221dp"
+        android:background="@drawable/edittext_bg"
+        android:ems="10"
+        android:inputType="textMultiLine"
+        android:text="" />
+
+    <EditText
+        android:id="@+id/amountOfOutputPlaceHolder"
+        android:layout_width="109dp"
+        android:layout_height="34dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="217dp"
+        android:background="@drawable/edittext_bg"
+        android:ems="10"
+        android:inputType="number"
+        android:text="5" />
+
+    <Switch
+        android:id="@+id/ingrRankingSwitch"
+        android:layout_width="122dp"
+        android:layout_height="64dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="141dp"
+        android:text="Maximize Ranking"
+        android:textColor="#900C3F"
+        android:textSize="15sp" />
+
+    <Button
+        android:id="@+id/searchRecipesBtn"
+        android:layout_width="185dp"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="72dp"
+        android:background="@drawable/button_generic"
+        android:text="Search Recipes"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintVertical_bias="0.0" />
+
+</RelativeLayout>

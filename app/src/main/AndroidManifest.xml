@@ -23,7 +23,8 @@
         </activity>
         <activity android:name=".activities.create_account.CreateAccount" />
         <activity android:name=".activities.main_navigation.MainNavigation" />
-        <activity android:name=".activities.profile.UserProfile"></activity>
+        <activity android:name=".activities.profile.UserProfile" />
+        <activity android:name=".activities.food_service.FoodService"></activity>
     </application>
 
 </manifest>
